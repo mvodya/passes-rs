@@ -1,10 +1,12 @@
 [package]
-authors = ["Mark Vodyanitskiy <mvodya@icloud.com>"]
-description = "Rust library for generate Apple Wallet Passes for iOS, WatchOS, MacOS."
 name = "passes"
-version = "0.0.1"
-edition = "2024"
+description = "Rust library for generate Apple Wallet Passes for iOS, WatchOS, MacOS."
+version = "0.1.0"
+edition = "2021"
+authors = ["Mark Vodyanitskiy <mvodya@icloud.com>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
