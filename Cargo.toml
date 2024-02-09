@@ -1,0 +1,10 @@
+[package]
+authors = ["Mark Vodyanitskiy <mvodya@icloud.com>"]
+description = "Rust library for generate Apple Wallet Passes for iOS, WatchOS, MacOS."
+name = "passes"
+version = "0.0.1"
+edition = "2024"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
