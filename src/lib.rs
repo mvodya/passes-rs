@@ -1,1 +1,1 @@
-mod pass;
+pub mod pass;
