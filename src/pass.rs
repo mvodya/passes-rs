@@ -6,6 +6,7 @@ pub mod visual_appearance;
 
 /// Represents a pass (pass.json file)
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Pass {
     /// (Required) The version of the file format. The value must be 1.
     pub format_version: u32,
@@ -54,6 +55,7 @@ pub struct Pass {
 
     /// A URL to be passed to the associated app when launching it.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "appLaunchURL")]
     pub app_launch_url: Option<String>,
 
     /// An array of App Store identifiers for apps associated with the pass.
@@ -66,6 +68,7 @@ pub struct Pass {
 
     /// The URL for a web service that you use to update or personalize the pass. The URL can include an optional port number.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "webServiceURL")]
     pub web_service_url: Option<String>,
 
     /// Controls whether to show the Share button on the back of a pass.
@@ -178,11 +181,11 @@ mod tests {
         println!("{}", serde_json::to_string_pretty(&pass).unwrap());
 
         let json_expected = r#"{
-  "format_version": 1,
-  "organization_name": "Apple inc.",
+  "formatVersion": 1,
+  "organizationName": "Apple inc.",
   "description": "Example pass",
-  "pass_type_identifier": "com.example.pass",
-  "team_identifier": "AA00AA0A0A"
+  "passTypeIdentifier": "com.example.pass",
+  "teamIdentifier": "AA00AA0A0A"
 }"#;
 
         assert_eq!(json_expected, json);

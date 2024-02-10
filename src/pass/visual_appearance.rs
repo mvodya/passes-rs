@@ -3,6 +3,7 @@ use serde::{de, Deserialize, Serialize};
 
 /// Visual appearance of a pass
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct VisualAppearance {
     /// A color for the label text of the pass.
     /// If you don’t provide a value, the system determines the label color.
@@ -119,9 +120,9 @@ mod tests {
         println!("{}", json);
 
         let json_expected = r#"{
-  "label_color": "rgb(255, 100, 100)",
-  "foreground_color": "rgb(255, 100, 100)",
-  "background_color": "rgb(255, 100, 100)"
+  "labelColor": "rgb(255, 100, 100)",
+  "foregroundColor": "rgb(255, 100, 100)",
+  "backgroundColor": "rgb(255, 100, 100)"
 }"#;
 
         assert_eq!(json_expected, json);
