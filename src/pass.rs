@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 use self::visual_appearance::VisualAppearance;
+use self::web_service::WebService;
 
 pub mod visual_appearance;
+pub mod web_service;
 
 /// Represents a pass (pass.json file)
 #[derive(Serialize, Deserialize, Debug)]
@@ -60,14 +62,11 @@ pub struct Pass {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub associated_store_identifiers: Vec<i32>,
 
-    /// The authentication token to use with the web service in the [web_service_url](Pass::web_service_url) key.
+    /// Implement a web server to register, update, and unregister a pass on a device.
+    /// See [Apple documentation](https://developer.apple.com/documentation/walletpasses/adding_a_web_service_to_update_passes)
+    #[serde(flatten)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub authentication_token: Option<String>,
-
-    /// The URL for a web service that you use to update or personalize the pass. The URL can include an optional port number.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "webServiceURL")]
-    pub web_service_url: Option<String>,
+    pub web_service: Option<WebService>,
 
     /// Controls whether to show the Share button on the back of a pass.
     /// A value of true removes the button. The default value is false.
@@ -145,8 +144,7 @@ impl PassBuilder {
             expiration_date: None,
             app_launch_url: None,
             associated_store_identifiers: Vec::new(),
-            authentication_token: None,
-            web_service_url: None,
+            web_service: None,
             sharing_prohibited: false,
             suppress_strip_shine: true,
             voided: false,
@@ -197,15 +195,9 @@ impl PassBuilder {
         self
     }
 
-    /// Adding [authentication_token](Pass::authentication_token)
-    pub fn authentication_token(mut self, field: String) -> PassBuilder {
-        self.pass.authentication_token = Some(field);
-        self
-    }
-
     /// Adding [web_service_url](Pass::web_service_url)
-    pub fn web_service_url(mut self, field: String) -> PassBuilder {
-        self.pass.web_service_url = Some(field);
+    pub fn web_service(mut self, web_service: WebService) -> PassBuilder {
+        self.pass.web_service = Some(web_service);
         self
     }
 
@@ -292,8 +284,10 @@ mod tests {
         .expiration_date(String::from("2024-02-08T00:00"))
         .app_launch_url(String::from("testapp:param?index=1"))
         .add_associated_store_identifier(100)
-        .authentication_token(String::from("abcdefg01234567890abcdefg"))
-        .web_service_url(String::from("https://example.com/passes/"))
+        .web_service(WebService {
+            authentication_token: String::from("abcdefg01234567890abcdefg"),
+            web_service_url: String::from("https://example.com/passes/"),
+        })
         .set_sharing_prohibited(false)
         .set_suppress_strip_shine(false)
         .voided(false)
