@@ -150,7 +150,7 @@ mod tests {
             ..Default::default()
         };
 
-        let json_pass = serde_json::to_string_pretty(&pass).unwrap();
+        let json = serde_json::to_string_pretty(&pass).unwrap();
 
         println!("{}", serde_json::to_string_pretty(&pass).unwrap());
 
@@ -162,7 +162,7 @@ mod tests {
   "team_identifier": "AA00AA0A0A"
 }"#;
 
-        assert_eq!(json_expected, json_pass);
+        assert_eq!(json_expected, json);
     }
 }
 

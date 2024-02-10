@@ -82,13 +82,13 @@ mod tests {
             logo_text: None,
         };
 
-        let json_pass = serde_json::to_string_pretty(&appearance).unwrap();
+        let json = serde_json::to_string_pretty(&appearance).unwrap();
 
-        println!("{}", json_pass);
+        println!("{}", json);
 
         let json_expected = r#"{}"#;
 
-        assert_eq!(json_expected, json_pass);
+        assert_eq!(json_expected, json);
     }
 
     #[test]
@@ -106,6 +106,8 @@ mod tests {
     fn make_black_color() {
         let color = Color::default();
 
+        println!("{:?}", color);
+
         assert_eq!(0, color.r);
         assert_eq!(0, color.g);
         assert_eq!(0, color.b);
@@ -114,6 +116,8 @@ mod tests {
     #[test]
     fn make_white_color() {
         let color = Color::white();
+
+        println!("{:?}", color);
 
         assert_eq!(255, color.r);
         assert_eq!(255, color.g);
