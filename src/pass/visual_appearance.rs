@@ -1,3 +1,4 @@
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 /// Visual appearance of a pass
@@ -6,15 +7,15 @@ pub struct VisualAppearance {
     /// A color for the label text of the pass.
     /// If you don’t provide a value, the system determines the label color.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub label_color: Option<String>,
+    pub label_color: Option<Color>,
 
     /// A foreground color for the pass
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub foreground_color: Option<String>,
+    pub foreground_color: Option<Color>,
 
     /// A background color for the pass
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub background_color: Option<String>,
+    pub background_color: Option<Color>,
 
     /// The text to display next to the logo on the pass.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -49,7 +50,7 @@ pub struct Color {
 impl Color {
     /// Creates a new `Color`.
     fn new(r: u8, g: u8, b: u8) -> Self {
-        Self { r: r, g: g, b: b }
+        Self { r, g, b }
     }
 
     /// Creates a white `Color`.
@@ -59,6 +60,36 @@ impl Color {
             g: 255,
             b: 255,
         }
+    }
+}
+
+impl Serialize for Color {
+    /// Serialize `Color` to format `rgb(red, blue, green)`
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let str = format!("rgb({}, {}, {})", self.r, self.g, self.b);
+        serializer.serialize_str(&str)
+    }
+}
+
+impl<'de> Deserialize<'de> for Color {
+    /// Deserialize `Color` from format `rgb(red, blue, green)`
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let str = String::deserialize(deserializer)?;
+
+        let re = Regex::new(r"rgb\((?P<r>\d+),\s*(?P<g>\d+),\s*(?P<b>\d+)\)").unwrap();
+        let captures = re.captures(&str).unwrap();
+
+        let r = captures["r"].parse::<u8>().unwrap();
+        let g = captures["g"].parse::<u8>().unwrap();
+        let b = captures["b"].parse::<u8>().unwrap();
+
+        Ok(Self { r, g, b })
     }
 }
 
@@ -76,17 +107,22 @@ mod tests {
     #[test]
     fn make_appearance() {
         let appearance = VisualAppearance {
-            label_color: None,
-            foreground_color: None,
-            background_color: None,
-            logo_text: None,
+            label_color: Some(Color::new(255, 100, 100)),
+            foreground_color: Some(Color::new(255, 100, 100)),
+            background_color: Some(Color::new(255, 100, 100)),
+            logo_text: Some(String::from("Test Logo")),
         };
 
         let json = serde_json::to_string_pretty(&appearance).unwrap();
 
         println!("{}", json);
 
-        let json_expected = r#"{}"#;
+        let json_expected = r#"{
+  "label_color": "rgb(255, 100, 100)",
+  "foreground_color": "rgb(255, 100, 100)",
+  "background_color": "rgb(255, 100, 100)",
+  "logo_text": "Test Logo"
+}"#;
 
         assert_eq!(json_expected, json);
     }
