@@ -6,29 +6,39 @@ use self::web_service::WebService;
 pub mod visual_appearance;
 pub mod web_service;
 
+/// Required fields for [Pass]
+/// Used for [Pass] construction
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct PassConfig {
+    /// The name of the organization.
+    pub organization_name: String,
+
+    /// A short description that iOS accessibility technologies use for a pass.
+    pub description: String,
+
+    /// The pass type identifier that’s registered with Apple.
+    /// The value must be the same as the distribution certificate used to sign the pass.
+    pub pass_type_identifier: String,
+
+    /// The Team ID for the Apple Developer Program account that registered the pass type identifier.
+    pub team_identifier: String,
+
+    /// An alphanumeric serial number.
+    /// The combination of the serial number and pass type identifier must be unique for each pass.
+    pub serial_number: String,
+}
+
 /// Represents a pass (pass.json file)
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Pass {
-    /// (Required) The version of the file format. The value must be 1.
-    pub format_version: u32,
+    /// The version of the file format. The value must be 1.
+    format_version: u32,
 
-    /// (Required) The name of the organization.
-    pub organization_name: String,
-
-    /// (Required) A short description that iOS accessibility technologies use for a pass.
-    pub description: String,
-
-    /// (Required) The pass type identifier that’s registered with Apple.
-    /// The value must be the same as the distribution certificate used to sign the pass.
-    pub pass_type_identifier: String,
-
-    /// (Required) The Team ID for the Apple Developer Program account that registered the pass type identifier.
-    pub team_identifier: String,
-
-    /// (Required) An alphanumeric serial number.
-    /// The combination of the serial number and pass type identifier must be unique for each pass.
-    pub serial_number: String,
+    /// Primary required fields, specified for pass.json
+    #[serde(flatten)]
+    pub config: PassConfig,
 
     /// An identifier the system uses to group related boarding passes or event tickets.
     /// Wallet displays passes with the same [grouping_identifier](Pass::grouping_identifier), [pass_type_identifier](Pass::pass_type_identifier), and type as a group.
@@ -121,22 +131,12 @@ pub struct PassBuilder {
 
 impl PassBuilder {
     /// Creates builder for `Pass`.
-    pub fn new(
-        organization_name: String,
-        description: String,
-        pass_type_identifier: String,
-        team_identifier: String,
-        serial_number: String,
-    ) -> Self {
+    pub fn new(config: PassConfig) -> Self {
         let pass = Pass {
             // setup required vars
             format_version: 1,
-            organization_name,
-            description,
-            pass_type_identifier,
-            team_identifier,
-            serial_number,
-            // Setup default vars
+            config,
+            // Setup default optional vars
             grouping_identifier: None,
             appearance: None,
             logo_text: None,
@@ -239,13 +239,13 @@ mod tests {
 
     #[test]
     fn make_minimal_pass() {
-        let pass = PassBuilder::new(
-            String::from("Apple inc."),
-            String::from("Example pass"),
-            String::from("com.example.pass"),
-            String::from("AA00AA0A0A"),
-            String::from("ABCDEFG1234567890"),
-        )
+        let pass = PassBuilder::new(PassConfig {
+            organization_name: String::from("Apple inc."),
+            description: String::from("Example pass"),
+            pass_type_identifier: String::from("com.example.pass"),
+            team_identifier: String::from("AA00AA0A0A"),
+            serial_number: String::from("ABCDEFG1234567890"),
+        })
         .build();
 
         let json = serde_json::to_string_pretty(&pass).unwrap();
@@ -266,13 +266,13 @@ mod tests {
 
     #[test]
     fn make_pass() {
-        let pass = PassBuilder::new(
-            String::from("Apple inc."),
-            String::from("Example pass"),
-            String::from("com.example.pass"),
-            String::from("AA00AA0A0A"),
-            String::from("ABCDEFG1234567890"),
-        )
+        let pass = PassBuilder::new(PassConfig {
+            organization_name: String::from("Apple inc."),
+            description: String::from("Example pass"),
+            pass_type_identifier: String::from("com.example.pass"),
+            team_identifier: String::from("AA00AA0A0A"),
+            serial_number: String::from("ABCDEFG1234567890"),
+        })
         .grouping_identifier(String::from("com.example.pass.app"))
         .appearance(VisualAppearance {
             label_color: None,
