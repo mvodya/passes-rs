@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+use self::barcode::Barcode;
 use self::visual_appearance::VisualAppearance;
 use self::web_service::WebService;
 
+pub mod barcode;
 pub mod visual_appearance;
 pub mod web_service;
 
@@ -94,9 +96,10 @@ pub struct Pass {
     #[serde(skip_serializing_if = "is_false")]
     pub voided: bool,
 
-    // TODO: Barcode on a pass
-    // The system uses the first displayable barcode for the device.
-    // pub barcodes: Vec<Barcode>,
+    /// Barcode on a pass
+    /// The system uses the first displayable barcode for the device.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub barcodes: Vec<Barcode>,
 
     // TODO: Array of Bluetooth Low Energy beacons the system uses to show a relevant pass.
     // pub beacons: Vec<Beacon>,
@@ -148,6 +151,7 @@ impl PassBuilder {
             sharing_prohibited: false,
             suppress_strip_shine: true,
             voided: false,
+            barcodes: Vec::new(),
             max_distance: None,
         };
         Self { pass }
@@ -216,6 +220,12 @@ impl PassBuilder {
     /// Adding [voided](Pass::voided)
     pub fn voided(mut self, field: bool) -> PassBuilder {
         self.pass.voided = field;
+        self
+    }
+
+    /// Adding [Barcode] to [barcodes](Pass::barcodes)
+    pub fn add_barcode(mut self, barcode: Barcode) -> PassBuilder {
+        self.pass.barcodes.push(barcode);
         self
     }
 
@@ -291,6 +301,12 @@ mod tests {
         .set_sharing_prohibited(false)
         .set_suppress_strip_shine(false)
         .voided(false)
+        .add_barcode(Barcode {
+            message: String::from("Hello world!"),
+            format: barcode::BarcodeFormat::QR,
+            alt_text: Some(String::from("test by test")),
+            ..Default::default()
+        })
         .max_distance(1000)
         .build();
 
@@ -318,6 +334,14 @@ mod tests {
   "authenticationToken": "abcdefg01234567890abcdefg",
   "webServiceURL": "https://example.com/passes/",
   "suppressStripShine": false,
+  "barcodes": [
+    {
+      "message": "Hello world!",
+      "format": "PKBarcodeFormatQR",
+      "altText": "test by test",
+      "messageEncoding": "iso-8859-1"
+    }
+  ],
   "maxDistance": 1000
 }"#;
 
