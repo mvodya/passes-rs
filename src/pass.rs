@@ -26,17 +26,15 @@ pub struct Pass {
 
     /// (Required) An alphanumeric serial number.
     /// The combination of the serial number and pass type identifier must be unique for each pass.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub serial_number: Option<String>,
+    pub serial_number: String,
 
     /// An identifier the system uses to group related boarding passes or event tickets.
     /// Wallet displays passes with the same [grouping_identifier](Pass::grouping_identifier), [pass_type_identifier](Pass::pass_type_identifier), and type as a group.
-    ///
     /// Use this identifier to group passes that are tightly related, such as boarding passes for different connections on the same trip.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub grouping_identifier: Option<String>,
 
-    // Colors and other visual parts of the pass
+    /// Colors and other visual parts of the pass
     #[serde(flatten)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub appearance: Option<VisualAppearance>,
@@ -129,6 +127,7 @@ impl PassBuilder {
         description: String,
         pass_type_identifier: String,
         team_identifier: String,
+        serial_number: String,
     ) -> Self {
         let pass = Pass {
             // setup required vars
@@ -137,8 +136,8 @@ impl PassBuilder {
             description,
             pass_type_identifier,
             team_identifier,
+            serial_number,
             // Setup default vars
-            serial_number: None,
             grouping_identifier: None,
             appearance: None,
             logo_text: None,
@@ -156,6 +155,84 @@ impl PassBuilder {
         Self { pass }
     }
 
+    /// Adding [grouping_identifier](Pass::grouping_identifier)
+    pub fn grouping_identifier(mut self, field: String) -> PassBuilder {
+        self.pass.grouping_identifier = Some(field);
+        self
+    }
+
+    /// Adding [appearance](Pass::appearance).
+    pub fn appearance(mut self, field: VisualAppearance) -> PassBuilder {
+        self.pass.appearance = Some(field);
+        self
+    }
+
+    /// Adding [logo_text](Pass::logo_text)
+    pub fn logo_text(mut self, field: String) -> PassBuilder {
+        self.pass.logo_text = Some(field);
+        self
+    }
+
+    /// Adding [relevant_date](Pass::relevant_date)
+    pub fn relevant_date(mut self, field: String) -> PassBuilder {
+        self.pass.relevant_date = Some(field);
+        self
+    }
+
+    /// Adding [expiration_date](Pass::expiration_date)
+    pub fn expiration_date(mut self, field: String) -> PassBuilder {
+        self.pass.expiration_date = Some(field);
+        self
+    }
+
+    /// Adding [app_launch_url](Pass::app_launch_url)
+    pub fn app_launch_url(mut self, field: String) -> PassBuilder {
+        self.pass.app_launch_url = Some(field);
+        self
+    }
+
+    /// Adding [associated_store_identifiers](Pass::associated_store_identifiers)
+    pub fn add_associated_store_identifier(mut self, id: i32) -> PassBuilder {
+        self.pass.associated_store_identifiers.push(id);
+        self
+    }
+
+    /// Adding [authentication_token](Pass::authentication_token)
+    pub fn authentication_token(mut self, field: String) -> PassBuilder {
+        self.pass.authentication_token = Some(field);
+        self
+    }
+
+    /// Adding [web_service_url](Pass::web_service_url)
+    pub fn web_service_url(mut self, field: String) -> PassBuilder {
+        self.pass.web_service_url = Some(field);
+        self
+    }
+
+    /// Adding [sharing_prohibited](Pass::sharing_prohibited)
+    pub fn set_sharing_prohibited(mut self, field: bool) -> PassBuilder {
+        self.pass.sharing_prohibited = field;
+        self
+    }
+
+    /// Adding [suppress_strip_shine](Pass::suppress_strip_shine)
+    pub fn set_suppress_strip_shine(mut self, field: bool) -> PassBuilder {
+        self.pass.suppress_strip_shine = field;
+        self
+    }
+
+    /// Adding [voided](Pass::voided)
+    pub fn voided(mut self, field: bool) -> PassBuilder {
+        self.pass.voided = field;
+        self
+    }
+
+    /// Adding [max_distance](Pass::max_distance)
+    pub fn max_distance(mut self, field: u32) -> PassBuilder {
+        self.pass.max_distance = Some(field);
+        self
+    }
+
     /// Makes `Pass`.
     pub fn build(self) -> Pass {
         self.pass
@@ -164,15 +241,18 @@ impl PassBuilder {
 
 #[cfg(test)]
 mod tests {
+    use tests::visual_appearance::Color;
+
     use super::*;
 
     #[test]
-    fn make_pass() {
+    fn make_minimal_pass() {
         let pass = PassBuilder::new(
             String::from("Apple inc."),
             String::from("Example pass"),
             String::from("com.example.pass"),
             String::from("AA00AA0A0A"),
+            String::from("ABCDEFG1234567890"),
         )
         .build();
 
@@ -185,7 +265,66 @@ mod tests {
   "organizationName": "Apple inc.",
   "description": "Example pass",
   "passTypeIdentifier": "com.example.pass",
-  "teamIdentifier": "AA00AA0A0A"
+  "teamIdentifier": "AA00AA0A0A",
+  "serialNumber": "ABCDEFG1234567890"
+}"#;
+
+        assert_eq!(json_expected, json);
+    }
+
+    #[test]
+    fn make_pass() {
+        let pass = PassBuilder::new(
+            String::from("Apple inc."),
+            String::from("Example pass"),
+            String::from("com.example.pass"),
+            String::from("AA00AA0A0A"),
+            String::from("ABCDEFG1234567890"),
+        )
+        .grouping_identifier(String::from("com.example.pass.app"))
+        .appearance(VisualAppearance {
+            label_color: None,
+            foreground_color: Color::new(250, 10, 10),
+            background_color: Color::white(),
+        })
+        .logo_text(String::from("Test pass"))
+        .relevant_date(String::from("2024-02-07T00:00"))
+        .expiration_date(String::from("2024-02-08T00:00"))
+        .app_launch_url(String::from("testapp:param?index=1"))
+        .add_associated_store_identifier(100)
+        .authentication_token(String::from("abcdefg01234567890abcdefg"))
+        .web_service_url(String::from("https://example.com/passes/"))
+        .set_sharing_prohibited(false)
+        .set_suppress_strip_shine(false)
+        .voided(false)
+        .max_distance(1000)
+        .build();
+
+        let json = serde_json::to_string_pretty(&pass).unwrap();
+
+        println!("{}", serde_json::to_string_pretty(&pass).unwrap());
+
+        let json_expected = r#"{
+  "formatVersion": 1,
+  "organizationName": "Apple inc.",
+  "description": "Example pass",
+  "passTypeIdentifier": "com.example.pass",
+  "teamIdentifier": "AA00AA0A0A",
+  "serialNumber": "ABCDEFG1234567890",
+  "groupingIdentifier": "com.example.pass.app",
+  "foregroundColor": "rgb(250, 10, 10)",
+  "backgroundColor": "rgb(255, 255, 255)",
+  "logoText": "Test pass",
+  "relevantDate": "2024-02-07T00:00",
+  "expirationDate": "2024-02-08T00:00",
+  "appLaunchURL": "testapp:param?index=1",
+  "associatedStoreIdentifiers": [
+    100
+  ],
+  "authenticationToken": "abcdefg01234567890abcdefg",
+  "webServiceURL": "https://example.com/passes/",
+  "suppressStripShine": false,
+  "maxDistance": 1000
 }"#;
 
         assert_eq!(json_expected, json);

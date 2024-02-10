@@ -45,17 +45,17 @@ pub struct Color {
 
 impl Color {
     /// Creates a new `Color`.
-    fn new(r: u8, g: u8, b: u8) -> Option<Self> {
+    pub fn new(r: u8, g: u8, b: u8) -> Option<Self> {
         Some(Self { r, g, b })
     }
 
     /// Creates a white `Color`.
-    fn black() -> Option<Self> {
+    pub fn black() -> Option<Self> {
         Some(Self { r: 0, g: 0, b: 0 })
     }
 
     /// Creates a white `Color`.
-    fn white() -> Option<Self> {
+    pub fn white() -> Option<Self> {
         Some(Self {
             r: 255,
             g: 255,
