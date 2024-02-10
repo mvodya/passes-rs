@@ -33,6 +33,42 @@ impl Default for VisualAppearance {
     }
 }
 
+/// Represents color - specified as a CSS-style RGB triple
+#[derive(Debug)]
+pub struct Color {
+    /// Red
+    r: u8,
+
+    /// Green
+    g: u8,
+
+    /// Blue
+    b: u8,
+}
+
+impl Color {
+    /// Creates a new `Color`.
+    fn new(r: u8, g: u8, b: u8) -> Self {
+        Self { r: r, g: g, b: b }
+    }
+
+    /// Creates a white `Color`.
+    fn white() -> Self {
+        Self {
+            r: 255,
+            g: 255,
+            b: 255,
+        }
+    }
+}
+
+impl Default for Color {
+    /// Creates a black `Color`.
+    fn default() -> Self {
+        Self { r: 0, g: 0, b: 0 }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -53,5 +89,34 @@ mod tests {
         let json_expected = r#"{}"#;
 
         assert_eq!(json_expected, json_pass);
+    }
+
+    #[test]
+    fn make_new_color() {
+        let color = Color::new(100, 200, 240);
+
+        println!("{:?}", color);
+
+        assert_eq!(100, color.r);
+        assert_eq!(200, color.g);
+        assert_eq!(240, color.b);
+    }
+
+    #[test]
+    fn make_black_color() {
+        let color = Color::default();
+
+        assert_eq!(0, color.r);
+        assert_eq!(0, color.g);
+        assert_eq!(0, color.b);
+    }
+
+    #[test]
+    fn make_white_color() {
+        let color = Color::white();
+
+        assert_eq!(255, color.r);
+        assert_eq!(255, color.g);
+        assert_eq!(255, color.b);
     }
 }
