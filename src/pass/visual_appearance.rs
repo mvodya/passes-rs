@@ -16,10 +16,6 @@ pub struct VisualAppearance {
     /// A background color for the pass
     #[serde(skip_serializing_if = "Option::is_none")]
     pub background_color: Option<Color>,
-
-    /// The text to display next to the logo on the pass.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub logo_text: Option<String>,
 }
 
 impl Default for VisualAppearance {
@@ -29,7 +25,6 @@ impl Default for VisualAppearance {
             label_color: None,
             foreground_color: None,
             background_color: None,
-            logo_text: None,
         }
     }
 }
@@ -117,7 +112,6 @@ mod tests {
             label_color: Color::new(255, 100, 100),
             foreground_color: Color::new(255, 100, 100),
             background_color: Color::new(255, 100, 100),
-            logo_text: Some(String::from("Test Logo")),
         };
 
         let json = serde_json::to_string_pretty(&appearance).unwrap();
@@ -127,8 +121,7 @@ mod tests {
         let json_expected = r#"{
   "label_color": "rgb(255, 100, 100)",
   "foreground_color": "rgb(255, 100, 100)",
-  "background_color": "rgb(255, 100, 100)",
-  "logo_text": "Test Logo"
+  "background_color": "rgb(255, 100, 100)"
 }"#;
 
         assert_eq!(json_expected, json);

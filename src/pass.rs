@@ -40,6 +40,10 @@ pub struct Pass {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub appearance: Option<VisualAppearance>,
 
+    /// The text to display next to the logo on the pass.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub logo_text: Option<String>,
+
     /// The date and time when the pass becomes relevant
     #[serde(skip_serializing_if = "Option::is_none")]
     pub relevant_date: Option<String>,
@@ -134,6 +138,7 @@ impl PassBuilder {
             serial_number: None,
             grouping_identifier: None,
             appearance: None,
+            logo_text: None,
             relevant_date: None,
             expiration_date: None,
             app_launch_url: None,
