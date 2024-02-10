@@ -110,15 +110,27 @@ pub struct Pass {
     // custom JSOM
 }
 
-impl Default for Pass {
-    /// Creates an empty `Pass`.
-    fn default() -> Self {
-        Self {
+/// Builder for pass (represents pass.json file)
+pub struct PassBuilder {
+    pass: Pass,
+}
+
+impl PassBuilder {
+    /// Creates builder for `Pass`.
+    pub fn new(
+        organization_name: String,
+        description: String,
+        pass_type_identifier: String,
+        team_identifier: String,
+    ) -> Self {
+        let pass = Pass {
+            // setup required vars
             format_version: 1,
-            organization_name: Default::default(),
-            description: Default::default(),
-            pass_type_identifier: Default::default(),
-            team_identifier: Default::default(),
+            organization_name,
+            description,
+            pass_type_identifier,
+            team_identifier,
+            // Setup default vars
             serial_number: None,
             grouping_identifier: None,
             appearance: None,
@@ -132,7 +144,13 @@ impl Default for Pass {
             suppress_strip_shine: true,
             voided: false,
             max_distance: None,
-        }
+        };
+        Self { pass }
+    }
+
+    /// Makes `Pass`.
+    pub fn build(self) -> Pass {
+        self.pass
     }
 }
 
@@ -141,14 +159,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn make_default_pass() {
-        let pass = Pass {
-            organization_name: String::from("Apple inc."),
-            description: String::from("Example pass"),
-            pass_type_identifier: String::from("com.example.pass"),
-            team_identifier: String::from("AA00AA0A0A"),
-            ..Default::default()
-        };
+    fn make_pass() {
+        let pass = PassBuilder::new(
+            String::from("Apple inc."),
+            String::from("Example pass"),
+            String::from("com.example.pass"),
+            String::from("AA00AA0A0A"),
+        )
+        .build();
 
         let json = serde_json::to_string_pretty(&pass).unwrap();
 
