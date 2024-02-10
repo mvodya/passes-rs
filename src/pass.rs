@@ -73,17 +73,17 @@ pub struct Pass {
     /// A value of true removes the button. The default value is false.
     /// This flag has no effect in earlier versions of iOS, nor does it prevent sharing the pass in some other way.
     #[serde(skip_serializing_if = "is_false")]
-    pub sharing_prohibited: bool, // TODO: default false
+    pub sharing_prohibited: bool,
 
     /// Controls whether to display the strip image without a shine effect.
     /// The default value is true.
     #[serde(skip_serializing_if = "is_true")]
-    pub suppress_strip_shine: bool, // TODO: default true
+    pub suppress_strip_shine: bool,
 
     /// Indicates that the pass is void, such as a redeemed, one-time-use coupon.
     /// The default value is false.
     #[serde(skip_serializing_if = "is_false")]
-    pub voided: bool, // TODO: default false
+    pub voided: bool,
 
     // TODO: Barcode on a pass
     // The system uses the first displayable barcode for the device.
