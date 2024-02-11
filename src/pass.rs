@@ -1,14 +1,16 @@
 use serde::{Deserialize, Serialize};
 
 use self::barcode::Barcode;
+use self::beacon::Beacon;
+use self::nfc::NFC;
 use self::visual_appearance::VisualAppearance;
 use self::web_service::WebService;
-use self::beacon::Beacon;
 
 pub mod barcode;
+pub mod beacon;
+pub mod nfc;
 pub mod visual_appearance;
 pub mod web_service;
-pub mod beacon;
 
 /// Required fields for [Pass]
 /// Used for [Pass] construction
@@ -112,9 +114,10 @@ pub struct Pass {
     /// The maximum distance, in meters, from a location in the [locations](Pass::locations) array at which the pass is relevant.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_distance: Option<u32>,
-    // TODO: NFC
-    // pub nfc: Option<NFC>,
 
+    /// Near-field communication (NFC) payload the device passes to an Apple Pay terminal.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nfc: Option<NFC>,
     // TODO: Semantic tags
     // Metadata the system uses to offer a pass and suggest related actions.
     // For example, setting Don’t Disturb mode for the duration of a movie.
@@ -157,6 +160,7 @@ impl PassBuilder {
             barcodes: Vec::new(),
             beacons: Vec::new(),
             max_distance: None,
+            nfc: None,
         };
         Self { pass }
     }
@@ -245,6 +249,12 @@ impl PassBuilder {
         self
     }
 
+    /// Adding [nfc](Pass::nfc)
+    pub fn nfc(mut self, field: NFC) -> PassBuilder {
+        self.pass.nfc = Some(field);
+        self
+    }
+
     /// Makes `Pass`.
     pub fn build(self) -> Pass {
         self.pass
@@ -324,6 +334,11 @@ mod tests {
             relevant_text: Some(String::from("The simple beacon")),
         })
         .max_distance(1000)
+        .nfc(NFC {
+            encryption_public_key: String::from("ABCDEFG_0011223344556677889900"),
+            message: String::from("test message"),
+            ..Default::default()
+        })
         .build();
 
         let json = serde_json::to_string_pretty(&pass).unwrap();
@@ -366,7 +381,12 @@ mod tests {
       "relevantText": "The simple beacon"
     }
   ],
-  "maxDistance": 1000
+  "maxDistance": 1000,
+  "nfc": {
+    "encryptionPublicKey": "ABCDEFG_0011223344556677889900",
+    "message": "test message",
+    "requiresAuthentication": false
+  }
 }"#;
 
         assert_eq!(json_expected, json);
