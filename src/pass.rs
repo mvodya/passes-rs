@@ -3,10 +3,12 @@ use serde::{Deserialize, Serialize};
 use self::barcode::Barcode;
 use self::visual_appearance::VisualAppearance;
 use self::web_service::WebService;
+use self::beacon::Beacon;
 
 pub mod barcode;
 pub mod visual_appearance;
 pub mod web_service;
+pub mod beacon;
 
 /// Required fields for [Pass]
 /// Used for [Pass] construction
@@ -101,8 +103,9 @@ pub struct Pass {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub barcodes: Vec<Barcode>,
 
-    // TODO: Array of Bluetooth Low Energy beacons the system uses to show a relevant pass.
-    // pub beacons: Vec<Beacon>,
+    // Array of Bluetooth Low Energy beacons the system uses to show a relevant pass.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub beacons: Vec<Beacon>,
 
     // TODO: An array of up to 10 geographic locations the system uses to show a relevant pass.
     // pub locations: Vec<Location>,
@@ -152,6 +155,7 @@ impl PassBuilder {
             suppress_strip_shine: true,
             voided: false,
             barcodes: Vec::new(),
+            beacons: Vec::new(),
             max_distance: None,
         };
         Self { pass }
@@ -226,6 +230,12 @@ impl PassBuilder {
     /// Adding [Barcode] to [barcodes](Pass::barcodes)
     pub fn add_barcode(mut self, barcode: Barcode) -> PassBuilder {
         self.pass.barcodes.push(barcode);
+        self
+    }
+
+    /// Adding [Beacon] to [beacons](Pass::beacons)
+    pub fn add_beacon(mut self, beacon: Beacon) -> PassBuilder {
+        self.pass.beacons.push(beacon);
         self
     }
 
@@ -307,6 +317,12 @@ mod tests {
             alt_text: Some(String::from("test by test")),
             ..Default::default()
         })
+        .add_beacon(Beacon {
+            proximity_uuid: String::from("e286373b-15b5-4f4e-bf91-e9e64787724a"),
+            major: Some(2),
+            minor: Some(150),
+            relevant_text: Some(String::from("The simple beacon")),
+        })
         .max_distance(1000)
         .build();
 
@@ -340,6 +356,14 @@ mod tests {
       "format": "PKBarcodeFormatQR",
       "altText": "test by test",
       "messageEncoding": "iso-8859-1"
+    }
+  ],
+  "beacons": [
+    {
+      "proximityUUID": "e286373b-15b5-4f4e-bf91-e9e64787724a",
+      "major": 2,
+      "minor": 150,
+      "relevantText": "The simple beacon"
     }
   ],
   "maxDistance": 1000
