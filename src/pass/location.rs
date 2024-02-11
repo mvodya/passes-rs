@@ -37,7 +37,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn make_nfc() {
+    fn make_location() {
         let location = Location {
             latitude: 37.334606,
             longitude: -122.009102,
