@@ -2,12 +2,14 @@ use serde::{Deserialize, Serialize};
 
 use self::barcode::Barcode;
 use self::beacon::Beacon;
+use self::location::Location;
 use self::nfc::NFC;
 use self::visual_appearance::VisualAppearance;
 use self::web_service::WebService;
 
 pub mod barcode;
 pub mod beacon;
+pub mod location;
 pub mod nfc;
 pub mod visual_appearance;
 pub mod web_service;
@@ -109,8 +111,10 @@ pub struct Pass {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub beacons: Vec<Beacon>,
 
-    // TODO: An array of up to 10 geographic locations the system uses to show a relevant pass.
-    // pub locations: Vec<Location>,
+    // An array of up to 10 geographic locations the system uses to show a relevant pass.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub locations: Vec<Location>,
+
     /// The maximum distance, in meters, from a location in the [locations](Pass::locations) array at which the pass is relevant.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_distance: Option<u32>,
@@ -159,6 +163,7 @@ impl PassBuilder {
             voided: false,
             barcodes: Vec::new(),
             beacons: Vec::new(),
+            locations: Vec::new(),
             max_distance: None,
             nfc: None,
         };
@@ -240,6 +245,16 @@ impl PassBuilder {
     /// Adding [Beacon] to [beacons](Pass::beacons)
     pub fn add_beacon(mut self, beacon: Beacon) -> PassBuilder {
         self.pass.beacons.push(beacon);
+        self
+    }
+
+    /// Adding [Location] to [locations](Pass::locations)
+    pub fn add_location(mut self, location: Location) -> PassBuilder {
+        assert!(
+            self.pass.locations.len() < 10,
+            "Reached limit for geographic locations (maximum - 10)"
+        );
+        self.pass.locations.push(location);
         self
     }
 
@@ -333,6 +348,12 @@ mod tests {
             minor: Some(150),
             relevant_text: Some(String::from("The simple beacon")),
         })
+        .add_location(Location {
+            latitude: 37.334606,
+            longitude: -122.009102,
+            relevant_text: Some(String::from("Apple Park, Cupertino, CA, USA")),
+            ..Default::default()
+        })
         .max_distance(1000)
         .nfc(NFC {
             encryption_public_key: String::from("ABCDEFG_0011223344556677889900"),
@@ -379,6 +400,13 @@ mod tests {
       "major": 2,
       "minor": 150,
       "relevantText": "The simple beacon"
+    }
+  ],
+  "locations": [
+    {
+      "latitude": 37.334606,
+      "longitude": -122.009102,
+      "relevantText": "Apple Park, Cupertino, CA, USA"
     }
   ],
   "maxDistance": 1000,
