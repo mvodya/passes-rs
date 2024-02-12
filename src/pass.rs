@@ -13,6 +13,7 @@ pub mod location;
 pub mod nfc;
 pub mod visual_appearance;
 pub mod web_service;
+pub mod semantic_tags;
 
 /// Required fields for [Pass]
 /// Used for [Pass] construction
