@@ -1,8 +1,9 @@
+use is_empty::IsEmpty;
 use serde::{Deserialize, Serialize};
 
 /// Machine-readable metadata the system uses to offer a pass and suggest related actions.
 /// https://developer.apple.com/documentation/walletpasses/semantictags
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, IsEmpty)]
 #[serde(rename_all = "camelCase")]
 pub struct SemanticTags {
     /// The IATA airline code, such as “EX” for flightCode “EX123”. Use this key only for airline boarding passes.
@@ -13,6 +14,7 @@ pub struct SemanticTags {
     /// Use this key for any type of event ticket.
     #[serde(rename = "artistIDs")]
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[is_empty(if = "Vec::is_empty")]
     pub artist_ids: Vec<String>,
 
     /// The unique abbreviation of the away team’s name. Use this key only for a sports event ticket.
@@ -234,6 +236,7 @@ pub struct SemanticTags {
     /// An array of the full names of the performers and opening acts at the event, in decreasing order of significance.
     /// Use this key for any type of event ticket.
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[is_empty(if = "Vec::is_empty")]
     pub performer_names: Vec<String>,
 
     /// The priority status the ticketed passenger holds, such as “Gold” or “Silver”.
@@ -244,6 +247,7 @@ pub struct SemanticTags {
     /// An array of objects that represent the details for each seat at an event or on a transit journey.
     /// Use this key for any type of boarding pass or event ticket.
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[is_empty(if = "Vec::is_empty")]
     pub seats: Vec<SemanticTagSeat>,
 
     /// The type of security screening for the ticketed passenger, such as “Priority”.
@@ -321,6 +325,7 @@ pub struct SemanticTags {
     /// An array of objects that represent the WiFi networks associated with the event; for example, the network name and password associated with a developer conference.
     /// Use this key for any type of pass.
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[is_empty(if = "Vec::is_empty")]
     pub wifi_access: Vec<SemanticTagWifiNetwork>,
 }
 

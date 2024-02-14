@@ -1,9 +1,11 @@
+use is_empty::IsEmpty;
 use serde::{Deserialize, Serialize};
 
 use self::barcode::Barcode;
 use self::beacon::Beacon;
 use self::location::Location;
 use self::nfc::NFC;
+use self::semantic_tags::SemanticTags;
 use self::visual_appearance::VisualAppearance;
 use self::web_service::WebService;
 
@@ -11,9 +13,9 @@ pub mod barcode;
 pub mod beacon;
 pub mod location;
 pub mod nfc;
+pub mod semantic_tags;
 pub mod visual_appearance;
 pub mod web_service;
-pub mod semantic_tags;
 
 /// Required fields for [Pass]
 /// Used for [Pass] construction
@@ -123,11 +125,12 @@ pub struct Pass {
     /// Near-field communication (NFC) payload the device passes to an Apple Pay terminal.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nfc: Option<NFC>,
-    // TODO: Semantic tags
+
+    /// Semantic tags
     // Metadata the system uses to offer a pass and suggest related actions.
     // For example, setting Don’t Disturb mode for the duration of a movie.
-    // pub semantics: Vec<SemanticTag>,
-
+    #[serde(skip_serializing_if = "SemanticTags::is_empty")]
+    pub semantics: SemanticTags,
     // TODO: PassTypes
     // boarding pass
     // coupon
@@ -167,6 +170,7 @@ impl PassBuilder {
             locations: Vec::new(),
             max_distance: None,
             nfc: None,
+            semantics: Default::default(),
         };
         Self { pass }
     }
@@ -271,6 +275,12 @@ impl PassBuilder {
         self
     }
 
+    /// Adding [semantics](Pass::semantics)
+    pub fn semantics(mut self, field: SemanticTags) -> PassBuilder {
+        self.pass.semantics = field;
+        self
+    }
+
     /// Makes `Pass`.
     pub fn build(self) -> Pass {
         self.pass
@@ -279,7 +289,7 @@ impl PassBuilder {
 
 #[cfg(test)]
 mod tests {
-    use tests::visual_appearance::Color;
+    use tests::{semantic_tags::SemanticTagLocation, visual_appearance::Color};
 
     use super::*;
 
@@ -361,6 +371,15 @@ mod tests {
             message: String::from("test message"),
             ..Default::default()
         })
+        .semantics(SemanticTags {
+            airline_code: String::from("EX123").into(),
+            departure_location: SemanticTagLocation {
+                latitude: 43.3948533,
+                longitude: 132.1451673,
+            }
+            .into(),
+            ..Default::default()
+        })
         .build();
 
         let json = serde_json::to_string_pretty(&pass).unwrap();
@@ -415,6 +434,13 @@ mod tests {
     "encryptionPublicKey": "ABCDEFG_0011223344556677889900",
     "message": "test message",
     "requiresAuthentication": false
+  },
+  "semantics": {
+    "airlineCode": "EX123",
+    "departureLocation": {
+      "latitude": 43.3948533,
+      "longitude": 132.1451673
+    }
   }
 }"#;
 
