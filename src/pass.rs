@@ -5,6 +5,7 @@ use self::barcode::Barcode;
 use self::beacon::Beacon;
 use self::location::Location;
 use self::nfc::NFC;
+use self::pass_fields::{PassFields, PassType};
 use self::semantic_tags::SemanticTags;
 use self::visual_appearance::VisualAppearance;
 use self::web_service::WebService;
@@ -13,6 +14,7 @@ pub mod barcode;
 pub mod beacon;
 pub mod location;
 pub mod nfc;
+pub mod pass_fields;
 pub mod semantic_tags;
 pub mod visual_appearance;
 pub mod web_service;
@@ -131,7 +133,10 @@ pub struct Pass {
     // For example, setting Don’t Disturb mode for the duration of a movie.
     #[serde(skip_serializing_if = "SemanticTags::is_empty")]
     pub semantics: SemanticTags,
+
     // TODO: PassTypes
+    #[serde(flatten)]
+    pub pass_type: PassType,
     // boarding pass
     // coupon
     // event ticket
@@ -171,6 +176,11 @@ impl PassBuilder {
             max_distance: None,
             nfc: None,
             semantics: Default::default(),
+            pass_type: PassType::Generic {
+                pass_fields: PassFields {
+                    ..Default::default()
+                },
+            },
         };
         Self { pass }
     }
@@ -314,7 +324,14 @@ mod tests {
   "description": "Example pass",
   "passTypeIdentifier": "com.example.pass",
   "teamIdentifier": "AA00AA0A0A",
-  "serialNumber": "ABCDEFG1234567890"
+  "serialNumber": "ABCDEFG1234567890",
+  "generic": {
+    "auxiliaryFields": [],
+    "backFields": [],
+    "headerFields": [],
+    "primaryFields": [],
+    "secondaryFields": []
+  }
 }"#;
 
         assert_eq!(json_expected, json);
@@ -441,6 +458,13 @@ mod tests {
       "latitude": 43.3948533,
       "longitude": 132.1451673
     }
+  },
+  "generic": {
+    "auxiliaryFields": [],
+    "backFields": [],
+    "headerFields": [],
+    "primaryFields": [],
+    "secondaryFields": []
   }
 }"#;
 
