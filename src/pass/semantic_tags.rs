@@ -546,7 +546,7 @@ mod tests {
 
     #[test]
     fn make_semantic_tags() {
-        let mut tags = SemanticTags {
+        let tags = SemanticTags {
             airline_code: Some(String::from("EX123")),
             artist_ids: vec![
                 String::from("100"),
