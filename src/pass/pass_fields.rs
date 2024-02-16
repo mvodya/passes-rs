@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-type PassFieldContent = String;
-
 /// Represents the groups of fields that display information on the front and back of a pass.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -33,6 +31,89 @@ impl Default for PassFields {
             secondary_fields: Vec::new(),
         }
     }
+}
+
+/// Represents the information to display in a field on a pass.
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct PassFieldContent {
+    /// (Required) A unique key that identifies a field in the pass; for example, “departure-gate”.
+    pub key: String,
+
+    /// (Required) The value to use for the field; for example, 42. A date or time value must include a time zone.
+    pub value: String,
+
+    /// The value of the field, including HTML markup for links.
+    /// The only supported tag is the <a> tag and its href attribute.
+    /// The value of this key overrides that of the value key.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attributed_value: Option<String>,
+
+    /// A format string for the alert text to display when the pass is updated.
+    /// The format string must contain the escape %@, which is replaced with the field’s new value.
+    /// For example, “Gate changed to %@”.
+    ///
+    /// You must provide a value for the system to show a change notification.
+    ///
+    /// This field isn’t used for watchOS.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub change_message: Option<String>,
+
+    /// The currency code to use for the value of the field.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
+
+    /// The data detectors to apply to the value of a field on the back of the pass.
+    /// The default is to apply all data detectors. To use no data detectors, specify an empty array.
+    ///
+    /// You don’t use data detectors for fields on the front of the pass.
+    ///
+    /// This field isn’t used for watchOS.
+    ///
+    /// Possible Values: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub data_detector_types: Option<String>,
+
+    /// The style of the date to display in the field.
+    /// Possible Values: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub date_style: Option<String>,
+
+    /// A Boolean value that controls the time zone for the time and date to display in the field.
+    /// The default value is false, which displays the time and date using the current device’s time zone.
+    /// Otherwise, the time and date appear in the time zone associated with the date and time of value.
+    ///
+    /// This key doesn’t affect the pass relevance calculation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ignores_time_zone: Option<bool>,
+
+    /// A Boolean value that controls whether the date appears as a relative date.
+    /// The default value is false, which displays the date as an absolute date.
+    ///
+    /// This key doesn’t affect the pass relevance calculation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_relative: Option<bool>,
+
+    /// The text for a field label.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+
+    /// The style of the number to display in the field.
+    /// Formatter styles have the same meaning as the formats with corresponding names in NumberFormatter.Style.
+    /// Possible Values: PKNumberStyleDecimal, PKNumberStylePercent, PKNumberStyleScientific, PKNumberStyleSpellOut
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub number_style: Option<String>,
+
+    /// The alignment for the content of a field. The default is natural alignment, which aligns the text based on its script direction.
+    /// This key is invalid for primary and back fields.
+    /// Possible Values: PKTextAlignmentLeft, PKTextAlignmentCenter, PKTextAlignmentRight, PKTextAlignmentNatural
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub text_alignment: Option<String>,
+
+    /// The style of the time displayed in the field.
+    /// Possible Values: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub time_style: Option<String>,
 }
 
 /// Groups of fields that display information on the front and back of a pass.
