@@ -136,7 +136,7 @@ pub struct Pass {
 
     // TODO: PassTypes
     #[serde(flatten)]
-    pub pass_type: PassType,
+    pub fields: PassType,
     // boarding pass
     // coupon
     // event ticket
@@ -176,7 +176,7 @@ impl PassBuilder {
             max_distance: None,
             nfc: None,
             semantics: Default::default(),
-            pass_type: PassType::Generic {
+            fields: PassType::Generic {
                 pass_fields: PassFields {
                     ..Default::default()
                 },
@@ -291,6 +291,12 @@ impl PassBuilder {
         self
     }
 
+    /// Adding [fields](Pass::fields)
+    pub fn fields(mut self, field: PassType) -> PassBuilder {
+        self.pass.fields = field;
+        self
+    }
+
     /// Makes `Pass`.
     pub fn build(self) -> Pass {
         self.pass
@@ -299,7 +305,11 @@ impl PassBuilder {
 
 #[cfg(test)]
 mod tests {
-    use tests::{semantic_tags::SemanticTagLocation, visual_appearance::Color};
+    use tests::{
+        pass_fields::{PassFieldContent, PassFieldContentOptions},
+        semantic_tags::SemanticTagLocation,
+        visual_appearance::Color,
+    };
 
     use super::*;
 
@@ -397,6 +407,57 @@ mod tests {
             .into(),
             ..Default::default()
         })
+        .fields(
+            PassType::BoardingPass {
+                pass_fields: PassFields {
+                    ..Default::default()
+                },
+                transit_type: String::from("PKTransitTypeAir"),
+            }
+            .add_header_field(PassFieldContent::new(
+                "serial",
+                "1122",
+                PassFieldContentOptions {
+                    label: String::from("SERIAL").into(),
+                    ..Default::default()
+                },
+            ))
+            .add_header_field(PassFieldContent::new(
+                "number",
+                "0011223344",
+                PassFieldContentOptions {
+                    label: String::from("NUMBER").into(),
+                    text_alignment: String::from("PKTextAlignmentRight").into(),
+                    ..Default::default()
+                },
+            ))
+            .add_primary_field(PassFieldContent::new(
+                "from",
+                "UHWW",
+                PassFieldContentOptions {
+                    label: String::from("FROM").into(),
+                    text_alignment: String::from("PKTextAlignmentLeft").into(),
+                    ..Default::default()
+                },
+            ))
+            .add_primary_field(PassFieldContent::new(
+                "to",
+                "RKSI",
+                PassFieldContentOptions {
+                    label: String::from("TO").into(),
+                    text_alignment: String::from("PKTextAlignmentRight").into(),
+                    ..Default::default()
+                },
+            ))
+            .add_auxiliary_field(PassFieldContent::new(
+                "date_departure",
+                "20.02.2024",
+                PassFieldContentOptions {
+                    label: String::from("Departure date").into(),
+                    ..Default::default()
+                },
+            )),
+        )
         .build();
 
         let json = serde_json::to_string_pretty(&pass).unwrap();
@@ -459,12 +520,44 @@ mod tests {
       "longitude": 132.1451673
     }
   },
-  "generic": {
-    "auxiliaryFields": [],
+  "boardingPass": {
+    "auxiliaryFields": [
+      {
+        "key": "date_departure",
+        "value": "20.02.2024",
+        "label": "Departure date"
+      }
+    ],
     "backFields": [],
-    "headerFields": [],
-    "primaryFields": [],
-    "secondaryFields": []
+    "headerFields": [
+      {
+        "key": "serial",
+        "value": "1122",
+        "label": "SERIAL"
+      },
+      {
+        "key": "number",
+        "value": "0011223344",
+        "label": "NUMBER",
+        "textAlignment": "PKTextAlignmentRight"
+      }
+    ],
+    "primaryFields": [
+      {
+        "key": "from",
+        "value": "UHWW",
+        "label": "FROM",
+        "textAlignment": "PKTextAlignmentLeft"
+      },
+      {
+        "key": "to",
+        "value": "RKSI",
+        "label": "TO",
+        "textAlignment": "PKTextAlignmentRight"
+      }
+    ],
+    "secondaryFields": [],
+    "transit_type": "PKTransitTypeAir"
   }
 }"#;
 

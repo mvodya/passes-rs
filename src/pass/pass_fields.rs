@@ -43,6 +43,26 @@ pub struct PassFieldContent {
     /// (Required) The value to use for the field; for example, 42. A date or time value must include a time zone.
     pub value: String,
 
+    /// All optionals
+    #[serde(flatten)]
+    pub options: PassFieldContentOptions,
+}
+
+impl PassFieldContent {
+    /// Creates `PassFieldContent`.
+    pub fn new(key: &str, value: &str, options: PassFieldContentOptions) -> Self {
+        Self {
+            key: String::from(key),
+            value: String::from(value),
+            options: options,
+        }
+    }
+}
+
+/// Represents options for `PassFieldContent`
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct PassFieldContentOptions {
     /// The value of the field, including HTML markup for links.
     /// The only supported tag is the <a> tag and its href attribute.
     /// The value of this key overrides that of the value key.
@@ -116,6 +136,25 @@ pub struct PassFieldContent {
     pub time_style: Option<String>,
 }
 
+impl Default for PassFieldContentOptions {
+    /// Creates an empty `PassFieldContentOptions`.
+    fn default() -> Self {
+        Self {
+            attributed_value: None,
+            change_message: None,
+            currency_code: None,
+            data_detector_types: None,
+            date_style: None,
+            ignores_time_zone: None,
+            is_relative: None,
+            label: None,
+            number_style: None,
+            text_alignment: None,
+            time_style: None,
+        }
+    }
+}
+
 /// Groups of fields that display information on the front and back of a pass.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -150,9 +189,135 @@ pub enum PassType {
     },
 }
 
+impl PassType {
+    /// Add field that display additional information on the front of a pass.
+    pub fn add_auxiliary_field(mut self, field: PassFieldContent) -> Self {
+        match self {
+            Self::BoardingPass {
+                ref mut pass_fields,
+                transit_type: _,
+            } => pass_fields.auxiliary_fields.push(field),
+            Self::Coupon {
+                ref mut pass_fields,
+            }
+            | Self::EventTicket {
+                ref mut pass_fields,
+            }
+            | Self::Generic {
+                ref mut pass_fields,
+            } => pass_fields.auxiliary_fields.push(field),
+        }
+        self
+    }
+
+    /// Add field that display information on the back of a pass.
+    pub fn add_back_field(mut self, field: PassFieldContent) -> Self {
+        match self {
+            Self::BoardingPass {
+                ref mut pass_fields,
+                transit_type: _,
+            } => pass_fields.back_fields.push(field),
+            Self::Coupon {
+                ref mut pass_fields,
+            }
+            | Self::EventTicket {
+                ref mut pass_fields,
+            }
+            | Self::Generic {
+                ref mut pass_fields,
+            } => pass_fields.back_fields.push(field),
+        }
+        self
+    }
+
+    /// Add field that display information at the top of a pass.
+    pub fn add_header_field(mut self, field: PassFieldContent) -> Self {
+        match self {
+            Self::BoardingPass {
+                ref mut pass_fields,
+                transit_type: _,
+            } => pass_fields.header_fields.push(field),
+            Self::Coupon {
+                ref mut pass_fields,
+            }
+            | Self::EventTicket {
+                ref mut pass_fields,
+            }
+            | Self::Generic {
+                ref mut pass_fields,
+            } => pass_fields.header_fields.push(field),
+        }
+        self
+    }
+
+    /// Add field that display the most important information on a pass.
+    pub fn add_primary_field(mut self, field: PassFieldContent) -> Self {
+        match self {
+            Self::BoardingPass {
+                ref mut pass_fields,
+                transit_type: _,
+            } => pass_fields.primary_fields.push(field),
+            Self::Coupon {
+                ref mut pass_fields,
+            }
+            | Self::EventTicket {
+                ref mut pass_fields,
+            }
+            | Self::Generic {
+                ref mut pass_fields,
+            } => pass_fields.primary_fields.push(field),
+        }
+        self
+    }
+
+    /// Add field that display supporting information on the front of a pass.
+    pub fn add_secondary_field(mut self, field: PassFieldContent) -> Self {
+        match self {
+            Self::BoardingPass {
+                ref mut pass_fields,
+                transit_type: _,
+            } => pass_fields.secondary_fields.push(field),
+            Self::Coupon {
+                ref mut pass_fields,
+            }
+            | Self::EventTicket {
+                ref mut pass_fields,
+            }
+            | Self::Generic {
+                ref mut pass_fields,
+            } => pass_fields.secondary_fields.push(field),
+        }
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn make_pass() {
+        let pass = PassType::Generic {
+            pass_fields: PassFields {
+                ..Default::default()
+            },
+        };
+
+        let json = serde_json::to_string_pretty(&pass).unwrap();
+
+        println!("{}", json);
+
+        let json_expected = r#"{
+  "generic": {
+    "auxiliaryFields": [],
+    "backFields": [],
+    "headerFields": [],
+    "primaryFields": [],
+    "secondaryFields": []
+  }
+}"#;
+        assert_eq!(json_expected, json);
+    }
 
     #[test]
     fn make_boarding_pass() {
@@ -160,8 +325,25 @@ mod tests {
             pass_fields: PassFields {
                 ..Default::default()
             },
-            transit_type: String::from("test"),
-        };
+            transit_type: String::from("PKTransitTypeAir"),
+        }
+        .add_primary_field(PassFieldContent::new(
+            "title",
+            "Airplane Ticket",
+            Default::default(),
+        ))
+        .add_primary_field(PassFieldContent::new("gate", "12", Default::default()))
+        .add_header_field(PassFieldContent::new("company", "DAL", Default::default()))
+        .add_header_field(PassFieldContent::new(
+            "company_sub",
+            "Dodo Air Lines",
+            Default::default(),
+        ))
+        .add_secondary_field(PassFieldContent::new(
+            "description",
+            "Some information here",
+            Default::default(),
+        ));
 
         let json = serde_json::to_string_pretty(&boarding_pass).unwrap();
 
@@ -171,10 +353,101 @@ mod tests {
   "boardingPass": {
     "auxiliaryFields": [],
     "backFields": [],
-    "headerFields": [],
-    "primaryFields": [],
-    "secondaryFields": [],
-    "transit_type": "test"
+    "headerFields": [
+      {
+        "key": "company",
+        "value": "DAL"
+      },
+      {
+        "key": "company_sub",
+        "value": "Dodo Air Lines"
+      }
+    ],
+    "primaryFields": [
+      {
+        "key": "title",
+        "value": "Airplane Ticket"
+      },
+      {
+        "key": "gate",
+        "value": "12"
+      }
+    ],
+    "secondaryFields": [
+      {
+        "key": "description",
+        "value": "Some information here"
+      }
+    ],
+    "transit_type": "PKTransitTypeAir"
+  }
+}"#;
+        assert_eq!(json_expected, json);
+    }
+
+    #[test]
+    fn make_event_ticket() {
+        let event_ticket = PassType::EventTicket {
+            pass_fields: PassFields {
+                ..Default::default()
+            },
+        }
+        .add_primary_field(PassFieldContent::new(
+            "title",
+            "Super Ticket",
+            PassFieldContentOptions {
+                label: String::from("NAME").into(),
+                ..Default::default()
+            },
+        ))
+        .add_primary_field(PassFieldContent::new("seat", "12", Default::default()))
+        .add_header_field(PassFieldContent::new(
+            "event_title",
+            "KKK",
+            Default::default(),
+        ))
+        .add_header_field(PassFieldContent::new("some", "123", Default::default()))
+        .add_secondary_field(PassFieldContent::new(
+            "description",
+            "Some information here",
+            Default::default(),
+        ));
+
+        let json = serde_json::to_string_pretty(&event_ticket).unwrap();
+
+        println!("{}", json);
+
+        let json_expected = r#"{
+  "eventTicket": {
+    "auxiliaryFields": [],
+    "backFields": [],
+    "headerFields": [
+      {
+        "key": "event_title",
+        "value": "KKK"
+      },
+      {
+        "key": "some",
+        "value": "123"
+      }
+    ],
+    "primaryFields": [
+      {
+        "key": "title",
+        "value": "Super Ticket",
+        "label": "NAME"
+      },
+      {
+        "key": "seat",
+        "value": "12"
+      }
+    ],
+    "secondaryFields": [
+      {
+        "key": "description",
+        "value": "Some information here"
+      }
+    ]
   }
 }"#;
         assert_eq!(json_expected, json);
