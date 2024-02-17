@@ -1,4 +1,7 @@
+use is_empty::IsEmpty;
 use serde::{Deserialize, Serialize};
+
+use super::semantic_tags::SemanticTags;
 
 /// Represents the groups of fields that display information on the front and back of a pass.
 #[derive(Serialize, Deserialize, Debug)]
@@ -134,6 +137,11 @@ pub struct PassFieldContentOptions {
     /// Possible Values: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull
     #[serde(skip_serializing_if = "Option::is_none")]
     pub time_style: Option<String>,
+
+    /// Semantic tags
+    // Metadata the system uses to offer a pass and suggest related actions.
+    #[serde(skip_serializing_if = "SemanticTags::is_empty")]
+    pub semantics: SemanticTags,
 }
 
 impl Default for PassFieldContentOptions {
@@ -151,6 +159,7 @@ impl Default for PassFieldContentOptions {
             number_style: None,
             text_alignment: None,
             time_style: None,
+            semantics: Default::default(),
         }
     }
 }
@@ -293,6 +302,8 @@ impl PassType {
 
 #[cfg(test)]
 mod tests {
+    use crate::pass::semantic_tags::SemanticTagSeat;
+
     use super::*;
 
     #[test]
@@ -332,7 +343,23 @@ mod tests {
             "Airplane Ticket",
             Default::default(),
         ))
-        .add_primary_field(PassFieldContent::new("gate", "12", Default::default()))
+        .add_primary_field(PassFieldContent::new(
+            "seat",
+            "12",
+            PassFieldContentOptions {
+                semantics: SemanticTags {
+                    seats: vec![SemanticTagSeat {
+                        seat_number: String::from("12").into(),
+                        seat_row: String::from("5A").into(),
+                        seat_section: String::from("A").into(),
+                        ..Default::default()
+                    }],
+                    ..Default::default()
+                },
+                label: String::from("Seat").into(),
+                ..Default::default()
+            },
+        ))
         .add_header_field(PassFieldContent::new("company", "DAL", Default::default()))
         .add_header_field(PassFieldContent::new(
             "company_sub",
@@ -369,8 +396,18 @@ mod tests {
         "value": "Airplane Ticket"
       },
       {
-        "key": "gate",
-        "value": "12"
+        "key": "seat",
+        "value": "12",
+        "label": "Seat",
+        "semantics": {
+          "seats": [
+            {
+              "seatNumber": "12",
+              "seatRow": "5A",
+              "seatSection": "A"
+            }
+          ]
+        }
       }
     ],
     "secondaryFields": [
