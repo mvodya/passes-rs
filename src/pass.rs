@@ -412,7 +412,7 @@ mod tests {
                 pass_fields: PassFields {
                     ..Default::default()
                 },
-                transit_type: String::from("PKTransitTypeAir"),
+                transit_type: pass_fields::TransitType::Air,
             }
             .add_header_field(PassFieldContent::new(
                 "serial",

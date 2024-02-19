@@ -223,8 +223,7 @@ pub enum PassType {
         pass_fields: PassFields,
 
         /// (Required) The type of transit for a boarding pass. This key is invalid for other types of passes.
-        /// Possible Values: PKTransitTypeAir, PKTransitTypeBoat, PKTransitTypeBus, PKTransitTypeGeneric, PKTransitTypeTrain
-        transit_type: String,
+        transit_type: TransitType,
     },
     /// Represents the groups of fields that display the information for a coupon.
     Coupon {
@@ -244,6 +243,21 @@ pub enum PassType {
         #[serde(flatten)]
         pass_fields: PassFields,
     },
+}
+
+/// The type of transit for a boarding pass.
+#[derive(Serialize, Deserialize, Debug)]
+pub enum TransitType {
+    #[serde(rename = "PKTransitTypeAir")]
+    Air,
+    #[serde(rename = "PKTransitTypeBoat")]
+    Boat,
+    #[serde(rename = "PKTransitTypeBus")]
+    Bus,
+    #[serde(rename = "PKTransitTypeGeneric")]
+    Generic,
+    #[serde(rename = "PKTransitTypeTrain")]
+    Train,
 }
 
 impl PassType {
@@ -384,7 +398,7 @@ mod tests {
             pass_fields: PassFields {
                 ..Default::default()
             },
-            transit_type: String::from("PKTransitTypeAir"),
+            transit_type: TransitType::Air,
         }
         .add_primary_field(PassFieldContent::new(
             "title",
