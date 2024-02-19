@@ -120,9 +120,8 @@ pub struct PassFieldContentOptions {
 
     /// The style of the number to display in the field.
     /// Formatter styles have the same meaning as the formats with corresponding names in NumberFormatter.Style.
-    /// Possible Values: PKNumberStyleDecimal, PKNumberStylePercent, PKNumberStyleScientific, PKNumberStyleSpellOut
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub number_style: Option<String>,
+    pub number_style: Option<NumberStyle>,
 
     /// The alignment for the content of a field. The default is natural alignment, which aligns the text based on its script direction.
     /// This key is invalid for primary and back fields.
@@ -187,6 +186,19 @@ pub enum DateStyle {
     Long,
     #[serde(rename = "PKDateStyleFull")]
     Full,
+}
+
+/// The style of the number to display in the field.
+#[derive(Serialize, Deserialize, Debug)]
+pub enum NumberStyle {
+    #[serde(rename = "PKNumberStyleDecimal")]
+    Decimal,
+    #[serde(rename = "PKNumberStylePercent")]
+    Percent,
+    #[serde(rename = "PKNumberStyleScientific")]
+    Scientific,
+    #[serde(rename = "PKNumberStyleSpellOut")]
+    SpellOut,
 }
 
 /// Groups of fields that display information on the front and back of a pass.
