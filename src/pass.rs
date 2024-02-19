@@ -306,7 +306,7 @@ impl PassBuilder {
 #[cfg(test)]
 mod tests {
     use tests::{
-        pass_fields::{PassFieldContent, PassFieldContentOptions},
+        pass_fields::{PassFieldContent, PassFieldContentOptions, TextAlignment},
         semantic_tags::SemanticTagLocation,
         visual_appearance::Color,
     };
@@ -427,7 +427,7 @@ mod tests {
                 "0011223344",
                 PassFieldContentOptions {
                     label: String::from("NUMBER").into(),
-                    text_alignment: String::from("PKTextAlignmentRight").into(),
+                    text_alignment: TextAlignment::Right.into(),
                     ..Default::default()
                 },
             ))
@@ -436,7 +436,7 @@ mod tests {
                 "UHWW",
                 PassFieldContentOptions {
                     label: String::from("FROM").into(),
-                    text_alignment: String::from("PKTextAlignmentLeft").into(),
+                    text_alignment: TextAlignment::Left.into(),
                     ..Default::default()
                 },
             ))
@@ -445,7 +445,7 @@ mod tests {
                 "RKSI",
                 PassFieldContentOptions {
                     label: String::from("TO").into(),
-                    text_alignment: String::from("PKTextAlignmentRight").into(),
+                    text_alignment: TextAlignment::Right.into(),
                     ..Default::default()
                 },
             ))
