@@ -125,9 +125,8 @@ pub struct PassFieldContentOptions {
 
     /// The alignment for the content of a field. The default is natural alignment, which aligns the text based on its script direction.
     /// This key is invalid for primary and back fields.
-    /// Possible Values: PKTextAlignmentLeft, PKTextAlignmentCenter, PKTextAlignmentRight, PKTextAlignmentNatural
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub text_alignment: Option<String>,
+    pub text_alignment: Option<TextAlignment>,
 
     /// The style of the time displayed in the field.
     /// Possible Values: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull
@@ -199,6 +198,19 @@ pub enum NumberStyle {
     Scientific,
     #[serde(rename = "PKNumberStyleSpellOut")]
     SpellOut,
+}
+
+/// The alignment for the content of a field.
+#[derive(Serialize, Deserialize, Debug)]
+pub enum TextAlignment {
+    #[serde(rename = "PKTextAlignmentLeft")]
+    Left,
+    #[serde(rename = "PKTextAlignmentCenter")]
+    Center,
+    #[serde(rename = "PKTextAlignmentRight")]
+    Right,
+    #[serde(rename = "PKTextAlignmentNatural")]
+    Natural,
 }
 
 /// Groups of fields that display information on the front and back of a pass.
