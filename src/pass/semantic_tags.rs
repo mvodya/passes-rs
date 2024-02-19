@@ -172,9 +172,8 @@ pub struct SemanticTags {
     pub event_start_date: Option<String>,
 
     /// The type of event. Use this key for any type of event ticket.
-    /// Possible Values: PKEventTypeGeneric, PKEventTypeLivePerformance, PKEventTypeMovie, PKEventTypeSports, PKEventTypeConference, PKEventTypeConvention, PKEventTypeWorkshop, PKEventTypeSocialGathering
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub event_type: Option<String>,
+    pub event_type: Option<SemanticEventType>,
 
     /// The IATA flight code, such as “EX123”. Use this key only for airline boarding passes.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -465,6 +464,27 @@ pub struct SemanticTagWifiNetwork {
     pub ssid: f64,
 }
 
+/// The type of event.
+#[derive(Serialize, Deserialize, Debug)]
+pub enum SemanticEventType {
+    #[serde(rename = "PKEventTypeGeneric")]
+    Generic,
+    #[serde(rename = "PKEventTypeLivePerformance")]
+    LivePerformance,
+    #[serde(rename = "PKEventTypeMovie")]
+    Movie,
+    #[serde(rename = "PKEventTypeSports")]
+    Sports,
+    #[serde(rename = "PKEventTypeConference")]
+    Conference,
+    #[serde(rename = "PKEventTypeConvention")]
+    Convention,
+    #[serde(rename = "PKEventTypeWorkshop")]
+    Workshop,
+    #[serde(rename = "PKEventTypeSocialGathering")]
+    SocialGathering,
+}
+
 impl Default for SemanticTags {
     /// Creates an empty `SemanticTags`.
     fn default() -> Self {
@@ -599,7 +619,7 @@ mod tests {
             event_end_date: String::from("2024-02-10T00:00").into(),
             event_name: String::from("Super cool movie").into(),
             event_start_date: String::from("2024-02-08T00:00").into(),
-            event_type: String::from("PKEventTypeGeneric").into(),
+            event_type: SemanticEventType::Generic.into(),
             flight_code: String::from("EX123").into(),
             passenger_name: SemanticTagPersonNameComponents {
               nickname: String::from("gigachad").into(),
