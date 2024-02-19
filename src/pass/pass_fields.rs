@@ -95,7 +95,7 @@ pub struct PassFieldContentOptions {
     ///
     /// Possible Values: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub data_detector_types: Option<String>,
+    pub data_detector_types: Option<DetectorTypes>,
 
     /// The style of the date to display in the field.
     /// Possible Values: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull
@@ -162,6 +162,19 @@ impl Default for PassFieldContentOptions {
             semantics: Default::default(),
         }
     }
+}
+
+/// The data detectors to apply to the value of a field on the back of the pass.
+#[derive(Serialize, Deserialize, Debug)]
+pub enum DetectorType {
+    #[serde(rename = "PKDataDetectorTypePhoneNumber")]
+    PhoneNumber,
+    #[serde(rename = "PKDataDetectorTypeLink")]
+    Link,
+    #[serde(rename = "PKDataDetectorTypeAddress")]
+    Address,
+    #[serde(rename = "PKDataDetectorTypeCalendarEvent")]
+    CalendarEvent,
 }
 
 /// Groups of fields that display information on the front and back of a pass.
