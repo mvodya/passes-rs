@@ -92,15 +92,12 @@ pub struct PassFieldContentOptions {
     /// You don’t use data detectors for fields on the front of the pass.
     ///
     /// This field isn’t used for watchOS.
-    ///
-    /// Possible Values: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub data_detector_types: Option<DetectorTypes>,
+    pub data_detector_types: Option<DetectorType>,
 
     /// The style of the date to display in the field.
-    /// Possible Values: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub date_style: Option<String>,
+    pub date_style: Option<DateStyle>,
 
     /// A Boolean value that controls the time zone for the time and date to display in the field.
     /// The default value is false, which displays the time and date using the current device’s time zone.
@@ -175,6 +172,21 @@ pub enum DetectorType {
     Address,
     #[serde(rename = "PKDataDetectorTypeCalendarEvent")]
     CalendarEvent,
+}
+
+/// The style of the date to display in the field.
+#[derive(Serialize, Deserialize, Debug)]
+pub enum DateStyle {
+    #[serde(rename = "PKDateStyleNone")]
+    None,
+    #[serde(rename = "PKDateStyleShort")]
+    Short,
+    #[serde(rename = "PKDateStyleMedium")]
+    Medium,
+    #[serde(rename = "PKDateStyleLong")]
+    Long,
+    #[serde(rename = "PKDateStyleFull")]
+    Full,
 }
 
 /// Groups of fields that display information on the front and back of a pass.
