@@ -129,9 +129,8 @@ pub struct PassFieldContentOptions {
     pub text_alignment: Option<TextAlignment>,
 
     /// The style of the time displayed in the field.
-    /// Possible Values: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub time_style: Option<String>,
+    pub time_style: Option<DateStyle>,
 
     /// Semantic tags
     // Metadata the system uses to offer a pass and suggest related actions.
