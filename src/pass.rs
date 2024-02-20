@@ -409,45 +409,45 @@ mod tests {
                 },
                 transit_type: fields::TransitType::Air,
             }
-            .add_header_field(fields::FieldContent::new(
+            .add_header_field(fields::Content::new(
                 "serial",
                 "1122",
-                fields::FieldContentOptions {
+                fields::ContentOptions {
                     label: String::from("SERIAL").into(),
                     ..Default::default()
                 },
             ))
-            .add_header_field(fields::FieldContent::new(
+            .add_header_field(fields::Content::new(
                 "number",
                 "0011223344",
-                fields::FieldContentOptions {
+                fields::ContentOptions {
                     label: String::from("NUMBER").into(),
                     text_alignment: fields::TextAlignment::Right.into(),
                     ..Default::default()
                 },
             ))
-            .add_primary_field(fields::FieldContent::new(
+            .add_primary_field(fields::Content::new(
                 "from",
                 "UHWW",
-                fields::FieldContentOptions {
+                fields::ContentOptions {
                     label: String::from("FROM").into(),
                     text_alignment: fields::TextAlignment::Left.into(),
                     ..Default::default()
                 },
             ))
-            .add_primary_field(fields::FieldContent::new(
+            .add_primary_field(fields::Content::new(
                 "to",
                 "RKSI",
-                fields::FieldContentOptions {
+                fields::ContentOptions {
                     label: String::from("TO").into(),
                     text_alignment: fields::TextAlignment::Right.into(),
                     ..Default::default()
                 },
             ))
-            .add_auxiliary_field(fields::FieldContent::new(
+            .add_auxiliary_field(fields::Content::new(
                 "date_departure",
                 "20.02.2024",
-                fields::FieldContentOptions {
+                fields::ContentOptions {
                     label: String::from("Departure date").into(),
                     ..Default::default()
                 },

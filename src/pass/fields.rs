@@ -8,19 +8,19 @@ use super::semantic_tags::SemanticTags;
 #[serde(rename_all = "camelCase")]
 pub struct Fields {
     /// Represents the fields that display additional information on the front of a pass.
-    pub auxiliary_fields: Vec<FieldContent>,
+    pub auxiliary_fields: Vec<Content>,
 
     /// Represents the fields that display information on the back of a pass.
-    pub back_fields: Vec<FieldContent>,
+    pub back_fields: Vec<Content>,
 
     /// Represents the fields that display information at the top of a pass.
-    pub header_fields: Vec<FieldContent>,
+    pub header_fields: Vec<Content>,
 
     /// Represents the fields that display the most important information on a pass.
-    pub primary_fields: Vec<FieldContent>,
+    pub primary_fields: Vec<Content>,
 
     /// Represents the fields that display supporting information on the front of a pass.
-    pub secondary_fields: Vec<FieldContent>,
+    pub secondary_fields: Vec<Content>,
 }
 
 impl Default for Fields {
@@ -39,7 +39,7 @@ impl Default for Fields {
 /// Represents the information to display in a field on a pass.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct FieldContent {
+pub struct Content {
     /// (Required) A unique key that identifies a field in the pass; for example, “departure-gate”.
     pub key: String,
 
@@ -48,12 +48,12 @@ pub struct FieldContent {
 
     /// All optionals
     #[serde(flatten)]
-    pub options: FieldContentOptions,
+    pub options: ContentOptions,
 }
 
-impl FieldContent {
+impl Content {
     /// Creates `FieldContent`.
-    pub fn new(key: &str, value: &str, options: FieldContentOptions) -> Self {
+    pub fn new(key: &str, value: &str, options: ContentOptions) -> Self {
         Self {
             key: String::from(key),
             value: String::from(value),
@@ -65,7 +65,7 @@ impl FieldContent {
 /// Represents options for `FieldContent`
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct FieldContentOptions {
+pub struct ContentOptions {
     /// The value of the field, including HTML markup for links.
     /// The only supported tag is the <a> tag and its href attribute.
     /// The value of this key overrides that of the value key.
@@ -138,7 +138,7 @@ pub struct FieldContentOptions {
     pub semantics: SemanticTags,
 }
 
-impl Default for FieldContentOptions {
+impl Default for ContentOptions {
     /// Creates an empty `FieldContentOptions`.
     fn default() -> Self {
         Self {
@@ -262,7 +262,7 @@ pub enum TransitType {
 
 impl Type {
     /// Add field that display additional information on the front of a pass.
-    pub fn add_auxiliary_field(mut self, field: FieldContent) -> Self {
+    pub fn add_auxiliary_field(mut self, field: Content) -> Self {
         match self {
             Self::BoardingPass {
                 ref mut pass_fields,
@@ -282,7 +282,7 @@ impl Type {
     }
 
     /// Add field that display information on the back of a pass.
-    pub fn add_back_field(mut self, field: FieldContent) -> Self {
+    pub fn add_back_field(mut self, field: Content) -> Self {
         match self {
             Self::BoardingPass {
                 ref mut pass_fields,
@@ -302,7 +302,7 @@ impl Type {
     }
 
     /// Add field that display information at the top of a pass.
-    pub fn add_header_field(mut self, field: FieldContent) -> Self {
+    pub fn add_header_field(mut self, field: Content) -> Self {
         match self {
             Self::BoardingPass {
                 ref mut pass_fields,
@@ -322,7 +322,7 @@ impl Type {
     }
 
     /// Add field that display the most important information on a pass.
-    pub fn add_primary_field(mut self, field: FieldContent) -> Self {
+    pub fn add_primary_field(mut self, field: Content) -> Self {
         match self {
             Self::BoardingPass {
                 ref mut pass_fields,
@@ -342,7 +342,7 @@ impl Type {
     }
 
     /// Add field that display supporting information on the front of a pass.
-    pub fn add_secondary_field(mut self, field: FieldContent) -> Self {
+    pub fn add_secondary_field(mut self, field: Content) -> Self {
         match self {
             Self::BoardingPass {
                 ref mut pass_fields,
@@ -400,15 +400,15 @@ mod tests {
             },
             transit_type: TransitType::Air,
         }
-        .add_primary_field(FieldContent::new(
+        .add_primary_field(Content::new(
             "title",
             "Airplane Ticket",
             Default::default(),
         ))
-        .add_primary_field(FieldContent::new(
+        .add_primary_field(Content::new(
             "seat",
             "12",
-            FieldContentOptions {
+            ContentOptions {
                 semantics: SemanticTags {
                     seats: vec![SemanticTagSeat {
                         seat_number: String::from("12").into(),
@@ -422,13 +422,13 @@ mod tests {
                 ..Default::default()
             },
         ))
-        .add_header_field(FieldContent::new("company", "DAL", Default::default()))
-        .add_header_field(FieldContent::new(
+        .add_header_field(Content::new("company", "DAL", Default::default()))
+        .add_header_field(Content::new(
             "company_sub",
             "Dodo Air Lines",
             Default::default(),
         ))
-        .add_secondary_field(FieldContent::new(
+        .add_secondary_field(Content::new(
             "description",
             "Some information here",
             Default::default(),
@@ -491,22 +491,22 @@ mod tests {
                 ..Default::default()
             },
         }
-        .add_primary_field(FieldContent::new(
+        .add_primary_field(Content::new(
             "title",
             "Super Ticket",
-            FieldContentOptions {
+            ContentOptions {
                 label: String::from("NAME").into(),
                 ..Default::default()
             },
         ))
-        .add_primary_field(FieldContent::new("seat", "12", Default::default()))
-        .add_header_field(FieldContent::new(
+        .add_primary_field(Content::new("seat", "12", Default::default()))
+        .add_header_field(Content::new(
             "event_title",
             "KKK",
             Default::default(),
         ))
-        .add_header_field(FieldContent::new("some", "123", Default::default()))
-        .add_secondary_field(FieldContent::new(
+        .add_header_field(Content::new("some", "123", Default::default()))
+        .add_secondary_field(Content::new(
             "description",
             "Some information here",
             Default::default(),
