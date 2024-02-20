@@ -134,13 +134,9 @@ pub struct Pass {
     #[serde(skip_serializing_if = "SemanticTags::is_empty")]
     pub semantics: SemanticTags,
 
-    // TODO: PassTypes
+    /// Groups of visible fields that display information on the front and back of a pass.
     #[serde(flatten)]
     pub fields: PassType,
-    // boarding pass
-    // coupon
-    // event ticket
-    // generic
 
     // TODO: UserInfo
     // custom JSOM
