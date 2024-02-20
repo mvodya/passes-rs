@@ -5,7 +5,6 @@ use self::barcode::Barcode;
 use self::beacon::Beacon;
 use self::location::Location;
 use self::nfc::NFC;
-use self::pass_fields::{PassFields, PassType};
 use self::semantic_tags::SemanticTags;
 use self::visual_appearance::VisualAppearance;
 use self::web_service::WebService;
@@ -14,7 +13,7 @@ pub mod barcode;
 pub mod beacon;
 pub mod location;
 pub mod nfc;
-pub mod pass_fields;
+pub mod fields;
 pub mod semantic_tags;
 pub mod visual_appearance;
 pub mod web_service;
@@ -136,7 +135,7 @@ pub struct Pass {
 
     /// Groups of visible fields that display information on the front and back of a pass.
     #[serde(flatten)]
-    pub fields: PassType,
+    pub fields: fields::Type,
 
     // TODO: UserInfo
     // custom JSOM
@@ -172,8 +171,8 @@ impl PassBuilder {
             max_distance: None,
             nfc: None,
             semantics: Default::default(),
-            fields: PassType::Generic {
-                pass_fields: PassFields {
+            fields: fields::Type::Generic {
+                pass_fields: fields::Fields {
                     ..Default::default()
                 },
             },
@@ -288,7 +287,7 @@ impl PassBuilder {
     }
 
     /// Adding [fields](Pass::fields)
-    pub fn fields(mut self, field: PassType) -> PassBuilder {
+    pub fn fields(mut self, field: fields::Type) -> PassBuilder {
         self.pass.fields = field;
         self
     }
@@ -302,7 +301,7 @@ impl PassBuilder {
 #[cfg(test)]
 mod tests {
     use tests::{
-        pass_fields::{PassFieldContent, PassFieldContentOptions, TextAlignment},
+        fields,
         semantic_tags::SemanticTagLocation,
         visual_appearance::Color,
     };
@@ -404,51 +403,51 @@ mod tests {
             ..Default::default()
         })
         .fields(
-            PassType::BoardingPass {
-                pass_fields: PassFields {
+            fields::Type::BoardingPass {
+                pass_fields: fields::Fields {
                     ..Default::default()
                 },
-                transit_type: pass_fields::TransitType::Air,
+                transit_type: fields::TransitType::Air,
             }
-            .add_header_field(PassFieldContent::new(
+            .add_header_field(fields::FieldContent::new(
                 "serial",
                 "1122",
-                PassFieldContentOptions {
+                fields::FieldContentOptions {
                     label: String::from("SERIAL").into(),
                     ..Default::default()
                 },
             ))
-            .add_header_field(PassFieldContent::new(
+            .add_header_field(fields::FieldContent::new(
                 "number",
                 "0011223344",
-                PassFieldContentOptions {
+                fields::FieldContentOptions {
                     label: String::from("NUMBER").into(),
-                    text_alignment: TextAlignment::Right.into(),
+                    text_alignment: fields::TextAlignment::Right.into(),
                     ..Default::default()
                 },
             ))
-            .add_primary_field(PassFieldContent::new(
+            .add_primary_field(fields::FieldContent::new(
                 "from",
                 "UHWW",
-                PassFieldContentOptions {
+                fields::FieldContentOptions {
                     label: String::from("FROM").into(),
-                    text_alignment: TextAlignment::Left.into(),
+                    text_alignment: fields::TextAlignment::Left.into(),
                     ..Default::default()
                 },
             ))
-            .add_primary_field(PassFieldContent::new(
+            .add_primary_field(fields::FieldContent::new(
                 "to",
                 "RKSI",
-                PassFieldContentOptions {
+                fields::FieldContentOptions {
                     label: String::from("TO").into(),
-                    text_alignment: TextAlignment::Right.into(),
+                    text_alignment: fields::TextAlignment::Right.into(),
                     ..Default::default()
                 },
             ))
-            .add_auxiliary_field(PassFieldContent::new(
+            .add_auxiliary_field(fields::FieldContent::new(
                 "date_departure",
                 "20.02.2024",
-                PassFieldContentOptions {
+                fields::FieldContentOptions {
                     label: String::from("Departure date").into(),
                     ..Default::default()
                 },

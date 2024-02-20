@@ -6,25 +6,25 @@ use super::semantic_tags::SemanticTags;
 /// Represents the groups of fields that display information on the front and back of a pass.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct PassFields {
+pub struct Fields {
     /// Represents the fields that display additional information on the front of a pass.
-    pub auxiliary_fields: Vec<PassFieldContent>,
+    pub auxiliary_fields: Vec<FieldContent>,
 
     /// Represents the fields that display information on the back of a pass.
-    pub back_fields: Vec<PassFieldContent>,
+    pub back_fields: Vec<FieldContent>,
 
     /// Represents the fields that display information at the top of a pass.
-    pub header_fields: Vec<PassFieldContent>,
+    pub header_fields: Vec<FieldContent>,
 
     /// Represents the fields that display the most important information on a pass.
-    pub primary_fields: Vec<PassFieldContent>,
+    pub primary_fields: Vec<FieldContent>,
 
     /// Represents the fields that display supporting information on the front of a pass.
-    pub secondary_fields: Vec<PassFieldContent>,
+    pub secondary_fields: Vec<FieldContent>,
 }
 
-impl Default for PassFields {
-    /// Creates an empty `PassFields`.
+impl Default for Fields {
+    /// Creates an empty `Fields`.
     fn default() -> Self {
         Self {
             auxiliary_fields: Vec::new(),
@@ -39,7 +39,7 @@ impl Default for PassFields {
 /// Represents the information to display in a field on a pass.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct PassFieldContent {
+pub struct FieldContent {
     /// (Required) A unique key that identifies a field in the pass; for example, “departure-gate”.
     pub key: String,
 
@@ -48,12 +48,12 @@ pub struct PassFieldContent {
 
     /// All optionals
     #[serde(flatten)]
-    pub options: PassFieldContentOptions,
+    pub options: FieldContentOptions,
 }
 
-impl PassFieldContent {
-    /// Creates `PassFieldContent`.
-    pub fn new(key: &str, value: &str, options: PassFieldContentOptions) -> Self {
+impl FieldContent {
+    /// Creates `FieldContent`.
+    pub fn new(key: &str, value: &str, options: FieldContentOptions) -> Self {
         Self {
             key: String::from(key),
             value: String::from(value),
@@ -62,10 +62,10 @@ impl PassFieldContent {
     }
 }
 
-/// Represents options for `PassFieldContent`
+/// Represents options for `FieldContent`
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct PassFieldContentOptions {
+pub struct FieldContentOptions {
     /// The value of the field, including HTML markup for links.
     /// The only supported tag is the <a> tag and its href attribute.
     /// The value of this key overrides that of the value key.
@@ -138,8 +138,8 @@ pub struct PassFieldContentOptions {
     pub semantics: SemanticTags,
 }
 
-impl Default for PassFieldContentOptions {
-    /// Creates an empty `PassFieldContentOptions`.
+impl Default for FieldContentOptions {
+    /// Creates an empty `FieldContentOptions`.
     fn default() -> Self {
         Self {
             attributed_value: None,
@@ -215,12 +215,12 @@ pub enum TextAlignment {
 /// Groups of fields that display information on the front and back of a pass.
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub enum PassType {
+pub enum Type {
     /// Represents the groups of fields that display the information for a boarding pass.
     BoardingPass {
         /// Groups of fields that display information on the front and back of a pass.
         #[serde(flatten)]
-        pass_fields: PassFields,
+        pass_fields: Fields,
 
         /// (Required) The type of transit for a boarding pass. This key is invalid for other types of passes.
         transit_type: TransitType,
@@ -229,19 +229,19 @@ pub enum PassType {
     Coupon {
         /// Groups of fields that display information on the front and back of a pass.
         #[serde(flatten)]
-        pass_fields: PassFields,
+        pass_fields: Fields,
     },
     /// Represents the groups of fields that display the information for an event ticket.
     EventTicket {
         /// Groups of fields that display information on the front and back of a pass.
         #[serde(flatten)]
-        pass_fields: PassFields,
+        pass_fields: Fields,
     },
     /// Represents the groups of fields that display the information for a generic pass.
     Generic {
         /// Groups of fields that display information on the front and back of a pass.
         #[serde(flatten)]
-        pass_fields: PassFields,
+        pass_fields: Fields,
     },
 }
 
@@ -260,9 +260,9 @@ pub enum TransitType {
     Train,
 }
 
-impl PassType {
+impl Type {
     /// Add field that display additional information on the front of a pass.
-    pub fn add_auxiliary_field(mut self, field: PassFieldContent) -> Self {
+    pub fn add_auxiliary_field(mut self, field: FieldContent) -> Self {
         match self {
             Self::BoardingPass {
                 ref mut pass_fields,
@@ -282,7 +282,7 @@ impl PassType {
     }
 
     /// Add field that display information on the back of a pass.
-    pub fn add_back_field(mut self, field: PassFieldContent) -> Self {
+    pub fn add_back_field(mut self, field: FieldContent) -> Self {
         match self {
             Self::BoardingPass {
                 ref mut pass_fields,
@@ -302,7 +302,7 @@ impl PassType {
     }
 
     /// Add field that display information at the top of a pass.
-    pub fn add_header_field(mut self, field: PassFieldContent) -> Self {
+    pub fn add_header_field(mut self, field: FieldContent) -> Self {
         match self {
             Self::BoardingPass {
                 ref mut pass_fields,
@@ -322,7 +322,7 @@ impl PassType {
     }
 
     /// Add field that display the most important information on a pass.
-    pub fn add_primary_field(mut self, field: PassFieldContent) -> Self {
+    pub fn add_primary_field(mut self, field: FieldContent) -> Self {
         match self {
             Self::BoardingPass {
                 ref mut pass_fields,
@@ -342,7 +342,7 @@ impl PassType {
     }
 
     /// Add field that display supporting information on the front of a pass.
-    pub fn add_secondary_field(mut self, field: PassFieldContent) -> Self {
+    pub fn add_secondary_field(mut self, field: FieldContent) -> Self {
         match self {
             Self::BoardingPass {
                 ref mut pass_fields,
@@ -370,8 +370,8 @@ mod tests {
 
     #[test]
     fn make_pass() {
-        let pass = PassType::Generic {
-            pass_fields: PassFields {
+        let pass = Type::Generic {
+            pass_fields: Fields {
                 ..Default::default()
             },
         };
@@ -394,21 +394,21 @@ mod tests {
 
     #[test]
     fn make_boarding_pass() {
-        let boarding_pass = PassType::BoardingPass {
-            pass_fields: PassFields {
+        let boarding_pass = Type::BoardingPass {
+            pass_fields: Fields {
                 ..Default::default()
             },
             transit_type: TransitType::Air,
         }
-        .add_primary_field(PassFieldContent::new(
+        .add_primary_field(FieldContent::new(
             "title",
             "Airplane Ticket",
             Default::default(),
         ))
-        .add_primary_field(PassFieldContent::new(
+        .add_primary_field(FieldContent::new(
             "seat",
             "12",
-            PassFieldContentOptions {
+            FieldContentOptions {
                 semantics: SemanticTags {
                     seats: vec![SemanticTagSeat {
                         seat_number: String::from("12").into(),
@@ -422,13 +422,13 @@ mod tests {
                 ..Default::default()
             },
         ))
-        .add_header_field(PassFieldContent::new("company", "DAL", Default::default()))
-        .add_header_field(PassFieldContent::new(
+        .add_header_field(FieldContent::new("company", "DAL", Default::default()))
+        .add_header_field(FieldContent::new(
             "company_sub",
             "Dodo Air Lines",
             Default::default(),
         ))
-        .add_secondary_field(PassFieldContent::new(
+        .add_secondary_field(FieldContent::new(
             "description",
             "Some information here",
             Default::default(),
@@ -486,27 +486,27 @@ mod tests {
 
     #[test]
     fn make_event_ticket() {
-        let event_ticket = PassType::EventTicket {
-            pass_fields: PassFields {
+        let event_ticket = Type::EventTicket {
+            pass_fields: Fields {
                 ..Default::default()
             },
         }
-        .add_primary_field(PassFieldContent::new(
+        .add_primary_field(FieldContent::new(
             "title",
             "Super Ticket",
-            PassFieldContentOptions {
+            FieldContentOptions {
                 label: String::from("NAME").into(),
                 ..Default::default()
             },
         ))
-        .add_primary_field(PassFieldContent::new("seat", "12", Default::default()))
-        .add_header_field(PassFieldContent::new(
+        .add_primary_field(FieldContent::new("seat", "12", Default::default()))
+        .add_header_field(FieldContent::new(
             "event_title",
             "KKK",
             Default::default(),
         ))
-        .add_header_field(PassFieldContent::new("some", "123", Default::default()))
-        .add_secondary_field(PassFieldContent::new(
+        .add_header_field(FieldContent::new("some", "123", Default::default()))
+        .add_secondary_field(FieldContent::new(
             "description",
             "Some information here",
             Default::default(),
