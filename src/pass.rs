@@ -470,8 +470,8 @@ mod tests {
   "foregroundColor": "rgb(250, 10, 10)",
   "backgroundColor": "rgb(255, 255, 255)",
   "logoText": "Test pass",
-  "relevantDate": "2024-02-07T00:00:00",
-  "expirationDate": "2024-02-08T00:00:00",
+  "relevantDate": "2024-02-07T00:00:00+00:00",
+  "expirationDate": "2024-02-08T00:00:00+00:00",
   "appLaunchURL": "testapp:param?index=1",
   "associatedStoreIdentifiers": [
     100
