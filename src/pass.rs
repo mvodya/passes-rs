@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use is_empty::IsEmpty;
 use serde::{Deserialize, Serialize};
 
@@ -11,9 +12,10 @@ use self::web_service::WebService;
 
 pub mod barcode;
 pub mod beacon;
+mod date_format;
+pub mod fields;
 pub mod location;
 pub mod nfc;
-pub mod fields;
 pub mod semantic_tags;
 pub mod visual_appearance;
 pub mod web_service;
@@ -69,11 +71,13 @@ pub struct Pass {
 
     /// The date and time when the pass becomes relevant
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub relevant_date: Option<String>,
+    #[serde(with = "date_format")]
+    pub relevant_date: Option<DateTime<Utc>>,
 
     /// The date and time the pass expires.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub expiration_date: Option<String>,
+    #[serde(with = "date_format")]
+    pub expiration_date: Option<DateTime<Utc>>,
 
     /// A URL to be passed to the associated app when launching it.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -136,7 +140,6 @@ pub struct Pass {
     /// Groups of visible fields that display information on the front and back of a pass.
     #[serde(flatten)]
     pub fields: fields::Type,
-
     // TODO: UserInfo
     // custom JSOM
 }
@@ -199,13 +202,13 @@ impl PassBuilder {
     }
 
     /// Adding [relevant_date](Pass::relevant_date)
-    pub fn relevant_date(mut self, field: String) -> PassBuilder {
+    pub fn relevant_date(mut self, field: DateTime<Utc>) -> PassBuilder {
         self.pass.relevant_date = Some(field);
         self
     }
 
     /// Adding [expiration_date](Pass::expiration_date)
-    pub fn expiration_date(mut self, field: String) -> PassBuilder {
+    pub fn expiration_date(mut self, field: DateTime<Utc>) -> PassBuilder {
         self.pass.expiration_date = Some(field);
         self
     }
@@ -300,11 +303,8 @@ impl PassBuilder {
 
 #[cfg(test)]
 mod tests {
-    use tests::{
-        fields,
-        semantic_tags::SemanticTagLocation,
-        visual_appearance::Color,
-    };
+    use chrono::prelude::*;
+    use tests::{fields, semantic_tags::SemanticTagLocation, visual_appearance::Color};
 
     use super::*;
 
@@ -358,8 +358,8 @@ mod tests {
             background_color: Color::white(),
         })
         .logo_text(String::from("Test pass"))
-        .relevant_date(String::from("2024-02-07T00:00"))
-        .expiration_date(String::from("2024-02-08T00:00"))
+        .relevant_date(Utc.with_ymd_and_hms(2024, 02, 07, 0, 0, 0).unwrap())
+        .expiration_date(Utc.with_ymd_and_hms(2024, 02, 08, 0, 0, 0).unwrap())
         .app_launch_url(String::from("testapp:param?index=1"))
         .add_associated_store_identifier(100)
         .web_service(WebService {
@@ -470,8 +470,8 @@ mod tests {
   "foregroundColor": "rgb(250, 10, 10)",
   "backgroundColor": "rgb(255, 255, 255)",
   "logoText": "Test pass",
-  "relevantDate": "2024-02-07T00:00",
-  "expirationDate": "2024-02-08T00:00",
+  "relevantDate": "2024-02-07T00:00:00",
+  "expirationDate": "2024-02-08T00:00:00",
   "appLaunchURL": "testapp:param?index=1",
   "associatedStoreIdentifiers": [
     100
