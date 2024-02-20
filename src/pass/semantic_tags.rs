@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use is_empty::IsEmpty;
 use serde::{Deserialize, Serialize};
 
@@ -54,17 +55,20 @@ pub struct SemanticTags {
     /// The updated date and time of arrival, if different from the originally scheduled date and time.
     /// Use this key for any type of boarding pass.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub current_arrival_date: Option<String>,
+    #[serde(with = "super::date_format")]
+    pub current_arrival_date: Option<DateTime<Utc>>,
 
     /// The updated date and time of boarding, if different from the originally scheduled date and time.
     /// Use this key for any type of boarding pass.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub current_boarding_date: Option<String>,
+    #[serde(with = "super::date_format")]
+    pub current_boarding_date: Option<DateTime<Utc>>,
 
     /// The updated departure date and time, if different from the originally scheduled date and time.
     /// Use this key for any type of boarding pass.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub current_departure_date: Option<String>,
+    #[serde(with = "super::date_format")]
+    pub current_departure_date: Option<DateTime<Utc>>,
 
     /// The IATA airport code for the departure airport, such as “MPM” or “LHR”.
     /// Use this key only for airline boarding passes.
@@ -159,7 +163,8 @@ pub struct SemanticTags {
 
     /// The date and time the event ends. Use this key for any type of event ticket.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub event_end_date: Option<String>,
+    #[serde(with = "super::date_format")]
+    pub event_end_date: Option<DateTime<Utc>>,
 
     /// The full name of the event, such as the title of a movie.
     /// Use this key for any type of event ticket.
@@ -169,7 +174,8 @@ pub struct SemanticTags {
     /// The date and time the event starts.
     /// Use this key for any type of event ticket.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub event_start_date: Option<String>,
+    #[serde(with = "super::date_format")]
+    pub event_start_date: Option<DateTime<Utc>>,
 
     /// The type of event. Use this key for any type of event ticket.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -218,15 +224,18 @@ pub struct SemanticTags {
 
     /// The originally scheduled date and time of arrival. Use this key for any type of boarding pass.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub original_arrival_date: Option<String>,
+    #[serde(with = "super::date_format")]
+    pub original_arrival_date: Option<DateTime<Utc>>,
 
     /// The originally scheduled date and time of boarding. Use this key for any type of boarding pass.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub original_boarding_date: Option<String>,
+    #[serde(with = "super::date_format")]
+    pub original_boarding_date: Option<DateTime<Utc>>,
 
     /// The originally scheduled date and time of departure. Use this key for any type of boarding pass.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub original_departure_date: Option<String>,
+    #[serde(with = "super::date_format")]
+    pub original_departure_date: Option<DateTime<Utc>>,
 
     /// An object that represents the name of the passenger. Use this key for any type of boarding pass.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -562,6 +571,8 @@ impl Default for SemanticTags {
 
 #[cfg(test)]
 mod tests {
+    use chrono::prelude::*;
+
     use super::*;
 
     #[test]
@@ -585,9 +596,9 @@ mod tests {
             boarding_sequence_number: String::from("123").into(),
             car_number: String::from("01").into(),
             confirmation_number: String::from("1234").into(),
-            current_arrival_date: String::from("2024-02-10T00:00").into(),
-            current_boarding_date: String::from("2024-02-08T00:00").into(),
-            current_departure_date: String::from("2024-02-09T00:00").into(),
+            current_arrival_date: Utc.with_ymd_and_hms(2024, 02, 10, 0, 0, 0).unwrap().into(),
+            current_boarding_date: Utc.with_ymd_and_hms(2024, 02, 08, 0, 0, 0).unwrap().into(),
+            current_departure_date: Utc.with_ymd_and_hms(2024, 02, 09, 0, 0, 0).unwrap().into(),
             departure_airport_code: String::from("VVO").into(),
             departure_airport_name: String::from("Vladivostok International Airport").into(),
             departure_gate: String::from("8").into(),
@@ -616,9 +627,9 @@ mod tests {
             destination_station_name: String::from("2st Street Station").into(),
             destination_terminal: String::from("B").into(),
             duration: Some(12345),
-            event_end_date: String::from("2024-02-10T00:00").into(),
+            event_end_date: Utc.with_ymd_and_hms(2024, 02, 10, 0, 0, 0).unwrap().into(),
             event_name: String::from("Super cool movie").into(),
-            event_start_date: String::from("2024-02-08T00:00").into(),
+            event_start_date: Utc.with_ymd_and_hms(2024, 02, 10, 8, 0, 0).unwrap().into(),
             event_type: SemanticEventType::Generic.into(),
             flight_code: String::from("EX123").into(),
             passenger_name: SemanticTagPersonNameComponents {
@@ -661,9 +672,9 @@ mod tests {
   "boardingSequenceNumber": "123",
   "carNumber": "01",
   "confirmationNumber": "1234",
-  "currentArrivalDate": "2024-02-10T00:00",
-  "currentBoardingDate": "2024-02-08T00:00",
-  "currentDepartureDate": "2024-02-09T00:00",
+  "currentArrivalDate": "2024-02-10T00:00:00",
+  "currentBoardingDate": "2024-02-08T00:00:00",
+  "currentDepartureDate": "2024-02-09T00:00:00",
   "departureAirportCode": "VVO",
   "departureAirportName": "Vladivostok International Airport",
   "departureGate": "8",
@@ -687,9 +698,9 @@ mod tests {
   "destinationStationName": "2st Street Station",
   "destinationTerminal": "B",
   "duration": 12345,
-  "eventEndDate": "2024-02-10T00:00",
+  "eventEndDate": "2024-02-10T00:00:00",
   "eventName": "Super cool movie",
-  "eventStartDate": "2024-02-08T00:00",
+  "eventStartDate": "2024-02-10T08:00:00",
   "eventType": "PKEventTypeGeneric",
   "flightCode": "EX123",
   "passengerName": {
