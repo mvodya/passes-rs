@@ -111,7 +111,7 @@ pub struct Pass {
 
     /// Controls whether to display the strip image without a shine effect.
     /// The default value is true.
-    #[serde(default="_default_true")]
+    #[serde(default = "_default_true")]
     #[serde(skip_serializing_if = "_is_true")]
     pub suppress_strip_shine: bool,
 
@@ -159,6 +159,14 @@ pub struct Pass {
     pub fields: fields::Type,
     // TODO: UserInfo
     // custom JSOM
+}
+
+impl Pass {
+    // Build JSON output for pass (pass.json)
+    pub fn make_json(&self) -> Result<String, serde_json::Error> {
+        let json = serde_json::to_string_pretty(&self)?;
+        Ok(json)
+    }
 }
 
 /// Builder for pass (represents pass.json file)
@@ -337,9 +345,9 @@ mod tests {
         })
         .build();
 
-        let json = serde_json::to_string_pretty(&pass).unwrap();
+        let json = pass.make_json().unwrap();
 
-        println!("{}", serde_json::to_string_pretty(&pass).unwrap());
+        println!("{}", json);
 
         let json_expected = r#"{
   "formatVersion": 1,
@@ -361,7 +369,7 @@ mod tests {
 
         // Deserialization test
         let pass: Pass = serde_json::from_str(json_expected).unwrap();
-        let json = serde_json::to_string_pretty(&pass).unwrap();
+        let json = pass.make_json().unwrap();
         assert_eq!(json_expected, json);
     }
 
@@ -479,9 +487,9 @@ mod tests {
         )
         .build();
 
-        let json = serde_json::to_string_pretty(&pass).unwrap();
+        let json = pass.make_json().unwrap();
 
-        println!("{}", serde_json::to_string_pretty(&pass).unwrap());
+        println!("{}", json);
 
         let json_expected = r#"{
   "formatVersion": 1,
@@ -584,7 +592,7 @@ mod tests {
 
         // Deserialization test
         let pass: Pass = serde_json::from_str(json_expected).unwrap();
-        let json = serde_json::to_string_pretty(&pass).unwrap();
+        let json = pass.make_json().unwrap();
         assert_eq!(json_expected, json);
     }
 }
@@ -599,4 +607,6 @@ fn _is_true(b: &bool) -> bool {
 }
 
 // For serde (default boolean - true)
-const fn _default_true() -> bool { true }
+const fn _default_true() -> bool {
+    true
+}
