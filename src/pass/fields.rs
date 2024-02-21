@@ -69,6 +69,7 @@ pub struct ContentOptions {
     /// The value of the field, including HTML markup for links.
     /// The only supported tag is the <a> tag and its href attribute.
     /// The value of this key overrides that of the value key.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attributed_value: Option<String>,
 
@@ -79,10 +80,12 @@ pub struct ContentOptions {
     /// You must provide a value for the system to show a change notification.
     ///
     /// This field isn’t used for watchOS.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub change_message: Option<String>,
 
     /// The currency code to use for the value of the field.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub currency_code: Option<String>,
 
@@ -92,10 +95,12 @@ pub struct ContentOptions {
     /// You don’t use data detectors for fields on the front of the pass.
     ///
     /// This field isn’t used for watchOS.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data_detector_types: Option<DetectorType>,
 
     /// The style of the date to display in the field.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub date_style: Option<DateStyle>,
 
@@ -104,6 +109,7 @@ pub struct ContentOptions {
     /// Otherwise, the time and date appear in the time zone associated with the date and time of value.
     ///
     /// This key doesn’t affect the pass relevance calculation.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ignores_time_zone: Option<bool>,
 
@@ -111,20 +117,24 @@ pub struct ContentOptions {
     /// The default value is false, which displays the date as an absolute date.
     ///
     /// This key doesn’t affect the pass relevance calculation.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_relative: Option<bool>,
 
     /// The text for a field label.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
 
     /// The style of the number to display in the field.
     /// Formatter styles have the same meaning as the formats with corresponding names in NumberFormatter.Style.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub number_style: Option<NumberStyle>,
 
     /// The alignment for the content of a field. The default is natural alignment, which aligns the text based on its script direction.
     /// This key is invalid for primary and back fields.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text_alignment: Option<TextAlignment>,
 
@@ -134,6 +144,7 @@ pub struct ContentOptions {
 
     /// Semantic tags
     // Metadata the system uses to offer a pass and suggest related actions.
+    #[serde(default)]
     #[serde(skip_serializing_if = "SemanticTags::is_empty")]
     pub semantics: SemanticTags,
 }
@@ -370,6 +381,7 @@ mod tests {
 
     #[test]
     fn make_pass() {
+        // Serialization test
         let pass = Type::Generic {
             pass_fields: Fields {
                 ..Default::default()
@@ -390,21 +402,23 @@ mod tests {
   }
 }"#;
         assert_eq!(json_expected, json);
+
+        // Deserialization test
+        let pass: Type = serde_json::from_str(json_expected).unwrap();
+        let json = serde_json::to_string_pretty(&pass).unwrap();
+        assert_eq!(json_expected, json);
     }
 
     #[test]
     fn make_boarding_pass() {
+        // Serialization test
         let boarding_pass = Type::BoardingPass {
             pass_fields: Fields {
                 ..Default::default()
             },
             transit_type: TransitType::Air,
         }
-        .add_primary_field(Content::new(
-            "title",
-            "Airplane Ticket",
-            Default::default(),
-        ))
+        .add_primary_field(Content::new("title", "Airplane Ticket", Default::default()))
         .add_primary_field(Content::new(
             "seat",
             "12",
@@ -482,10 +496,16 @@ mod tests {
   }
 }"#;
         assert_eq!(json_expected, json);
+
+        // Deserialization test
+        let boarding_pass: Type = serde_json::from_str(json_expected).unwrap();
+        let json = serde_json::to_string_pretty(&boarding_pass).unwrap();
+        assert_eq!(json_expected, json);
     }
 
     #[test]
     fn make_event_ticket() {
+        // Serialization test
         let event_ticket = Type::EventTicket {
             pass_fields: Fields {
                 ..Default::default()
@@ -500,11 +520,7 @@ mod tests {
             },
         ))
         .add_primary_field(Content::new("seat", "12", Default::default()))
-        .add_header_field(Content::new(
-            "event_title",
-            "KKK",
-            Default::default(),
-        ))
+        .add_header_field(Content::new("event_title", "KKK", Default::default()))
         .add_header_field(Content::new("some", "123", Default::default()))
         .add_secondary_field(Content::new(
             "description",
@@ -549,6 +565,11 @@ mod tests {
     ]
   }
 }"#;
+        assert_eq!(json_expected, json);
+
+        // Deserialization test
+        let event_ticket: Type = serde_json::from_str(json_expected).unwrap();
+        let json = serde_json::to_string_pretty(&event_ticket).unwrap();
         assert_eq!(json_expected, json);
     }
 }

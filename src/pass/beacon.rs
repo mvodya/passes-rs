@@ -9,15 +9,18 @@ pub struct Beacon {
     pub proximity_uuid: String,
 
     /// The major identifier of a Bluetooth Low Energy location beacon.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub major: Option<u16>,
 
     /// The minor identifier of a Bluetooth Low Energy location beacon.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minor: Option<u16>,
 
     /// The text to display on the lock screen when the pass is relevant.
     /// For example, a description of a nearby location, such as “Store nearby on 1st and Main”.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub relevant_text: Option<String>,
 }
@@ -40,6 +43,7 @@ mod tests {
 
     #[test]
     fn make_beacon() {
+        // Serialization test
         let beacon = Beacon {
             proximity_uuid: String::from("e286373b-15b5-4f4e-bf91-e9e64787724a"),
             major: Some(2),
@@ -58,6 +62,11 @@ mod tests {
   "relevantText": "The simple beacon"
 }"#;
 
+        assert_eq!(json_expected, json);
+
+        // Deserialization test
+        let beacon: Beacon = serde_json::from_str(json_expected).unwrap();
+        let json = serde_json::to_string_pretty(&beacon).unwrap();
         assert_eq!(json_expected, json);
     }
 }

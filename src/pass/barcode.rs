@@ -13,6 +13,7 @@ pub struct Barcode {
 
     /// The text to display near the barcode.
     /// For example, a human-readable version of the barcode data in case the barcode doesn’t scan.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt_text: Option<String>,
 
@@ -58,6 +59,7 @@ mod tests {
 
     #[test]
     fn make_barcode() {
+        // Serialization test
         let barcode = Barcode {
             message: String::from("Hello world!"),
             format: BarcodeFormat::PDF417,
@@ -74,6 +76,11 @@ mod tests {
   "messageEncoding": "iso-8859-1"
 }"#;
 
+        assert_eq!(json_expected, json);
+
+        // Deserialization test
+        let barcode: Barcode = serde_json::from_str(json_expected).unwrap();
+        let json = serde_json::to_string_pretty(&barcode).unwrap();
         assert_eq!(json_expected, json);
     }
 }

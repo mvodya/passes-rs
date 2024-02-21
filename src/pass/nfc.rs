@@ -35,6 +35,7 @@ mod tests {
 
     #[test]
     fn make_nfc() {
+        // Serialization test
         let nfc = NFC {
             encryption_public_key: String::from("ABCDEFG_0011223344556677889900"),
             message: String::from("test message"),
@@ -51,6 +52,11 @@ mod tests {
   "requiresAuthentication": false
 }"#;
 
+        assert_eq!(json_expected, json);
+
+        // Deserialization test
+        let nfc: NFC = serde_json::from_str(json_expected).unwrap();
+        let json = serde_json::to_string_pretty(&nfc).unwrap();
         assert_eq!(json_expected, json);
     }
 }

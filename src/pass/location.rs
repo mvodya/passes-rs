@@ -11,11 +11,13 @@ pub struct Location {
     pub longitude: f64,
 
     /// The altitude, in meters, of the location.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub altitude: Option<f64>,
 
     /// The text to display on the lock screen when the pass is relevant.
     /// For example, a description of a nearby location, such as “Store nearby on 1st and Main”.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub relevant_text: Option<String>,
 }
@@ -38,6 +40,7 @@ mod tests {
 
     #[test]
     fn make_location() {
+        // Serialization test
         let location = Location {
             latitude: 37.334606,
             longitude: -122.009102,
@@ -55,6 +58,11 @@ mod tests {
   "relevantText": "Apple Park, Cupertino, CA, USA"
 }"#;
 
+        assert_eq!(json_expected, json);
+
+        // Deserialization test
+        let location: Location = serde_json::from_str(json_expected).unwrap();
+        let json = serde_json::to_string_pretty(&location).unwrap();
         assert_eq!(json_expected, json);
     }
 }

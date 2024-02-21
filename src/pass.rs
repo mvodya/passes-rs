@@ -57,39 +57,47 @@ pub struct Pass {
     /// An identifier the system uses to group related boarding passes or event tickets.
     /// Wallet displays passes with the same [grouping_identifier](Pass::grouping_identifier), [pass_type_identifier](Pass::pass_type_identifier), and type as a group.
     /// Use this identifier to group passes that are tightly related, such as boarding passes for different connections on the same trip.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub grouping_identifier: Option<String>,
 
     /// Colors and other visual parts of the pass
+    #[serde(default)]
     #[serde(flatten)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub appearance: Option<VisualAppearance>,
 
     /// The text to display next to the logo on the pass.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub logo_text: Option<String>,
 
     /// The date and time when the pass becomes relevant
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(with = "date_format")]
     pub relevant_date: Option<DateTime<Utc>>,
 
     /// The date and time the pass expires.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(with = "date_format")]
     pub expiration_date: Option<DateTime<Utc>>,
 
     /// A URL to be passed to the associated app when launching it.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "appLaunchURL")]
     pub app_launch_url: Option<String>,
 
     /// An array of App Store identifiers for apps associated with the pass.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub associated_store_identifiers: Vec<i32>,
 
     /// Implement a web server to register, update, and unregister a pass on a device.
     /// See [Apple documentation](https://developer.apple.com/documentation/walletpasses/adding_a_web_service_to_update_passes)
+    #[serde(default)]
     #[serde(flatten)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub web_service: Option<WebService>,
@@ -97,43 +105,52 @@ pub struct Pass {
     /// Controls whether to show the Share button on the back of a pass.
     /// A value of true removes the button. The default value is false.
     /// This flag has no effect in earlier versions of iOS, nor does it prevent sharing the pass in some other way.
-    #[serde(skip_serializing_if = "is_false")]
+    #[serde(default)]
+    #[serde(skip_serializing_if = "_is_false")]
     pub sharing_prohibited: bool,
 
     /// Controls whether to display the strip image without a shine effect.
     /// The default value is true.
-    #[serde(skip_serializing_if = "is_true")]
+    #[serde(default="_default_true")]
+    #[serde(skip_serializing_if = "_is_true")]
     pub suppress_strip_shine: bool,
 
     /// Indicates that the pass is void, such as a redeemed, one-time-use coupon.
     /// The default value is false.
-    #[serde(skip_serializing_if = "is_false")]
+    #[serde(default)]
+    #[serde(skip_serializing_if = "_is_false")]
     pub voided: bool,
 
     /// Barcode on a pass
     /// The system uses the first displayable barcode for the device.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub barcodes: Vec<Barcode>,
 
     // Array of Bluetooth Low Energy beacons the system uses to show a relevant pass.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub beacons: Vec<Beacon>,
 
     // An array of up to 10 geographic locations the system uses to show a relevant pass.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub locations: Vec<Location>,
 
     /// The maximum distance, in meters, from a location in the [locations](Pass::locations) array at which the pass is relevant.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_distance: Option<u32>,
 
     /// Near-field communication (NFC) payload the device passes to an Apple Pay terminal.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nfc: Option<NFC>,
 
     /// Semantic tags
     // Metadata the system uses to offer a pass and suggest related actions.
     // For example, setting Don’t Disturb mode for the duration of a movie.
+    #[serde(default)]
     #[serde(skip_serializing_if = "SemanticTags::is_empty")]
     pub semantics: SemanticTags,
 
@@ -310,6 +327,7 @@ mod tests {
 
     #[test]
     fn make_minimal_pass() {
+        // Serialization test
         let pass = PassBuilder::new(PassConfig {
             organization_name: String::from("Apple inc."),
             description: String::from("Example pass"),
@@ -338,6 +356,15 @@ mod tests {
     "secondaryFields": []
   }
 }"#;
+
+        assert_eq!(json_expected, json);
+
+        // Deserialization test
+        let pass: Pass = serde_json::from_str(json_expected).unwrap();
+        let json = serde_json::to_string_pretty(&pass).unwrap();
+
+        println!("{}", json);
+
 
         assert_eq!(json_expected, json);
     }
@@ -561,10 +588,13 @@ mod tests {
 }
 
 // For serde skipping - if boolean false
-fn is_false(b: &bool) -> bool {
+fn _is_false(b: &bool) -> bool {
     !b
 }
 // For serde skipping - if boolean true
-fn is_true(b: &bool) -> bool {
+fn _is_true(b: &bool) -> bool {
     *b
 }
+
+// For serde (default boolean - true)
+const fn _default_true() -> bool { true }

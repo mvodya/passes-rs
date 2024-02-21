@@ -7,14 +7,17 @@ use serde::{de, Deserialize, Serialize};
 pub struct VisualAppearance {
     /// A color for the label text of the pass.
     /// If you don’t provide a value, the system determines the label color.
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub label_color: Option<Color>,
 
     /// A foreground color for the pass
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub foreground_color: Option<Color>,
 
     /// A background color for the pass
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub background_color: Option<Color>,
 }
@@ -109,6 +112,7 @@ mod tests {
 
     #[test]
     fn make_appearance() {
+        // Serialization test
         let appearance = VisualAppearance {
             label_color: Color::new(255, 100, 100),
             foreground_color: Color::new(255, 100, 100),
@@ -125,6 +129,11 @@ mod tests {
   "backgroundColor": "rgb(255, 100, 100)"
 }"#;
 
+        assert_eq!(json_expected, json);
+
+        // Deserialization test
+        let appearance: VisualAppearance = serde_json::from_str(json_expected).unwrap();
+        let json = serde_json::to_string_pretty(&appearance).unwrap();
         assert_eq!(json_expected, json);
     }
 
