@@ -362,15 +362,12 @@ mod tests {
         // Deserialization test
         let pass: Pass = serde_json::from_str(json_expected).unwrap();
         let json = serde_json::to_string_pretty(&pass).unwrap();
-
-        println!("{}", json);
-
-
         assert_eq!(json_expected, json);
     }
 
     #[test]
     fn make_pass() {
+        // Serialization test
         let pass = PassBuilder::new(PassConfig {
             organization_name: String::from("Apple inc."),
             description: String::from("Example pass"),
@@ -583,6 +580,11 @@ mod tests {
   }
 }"#;
 
+        assert_eq!(json_expected, json);
+
+        // Deserialization test
+        let pass: Pass = serde_json::from_str(json_expected).unwrap();
+        let json = serde_json::to_string_pretty(&pass).unwrap();
         assert_eq!(json_expected, json);
     }
 }
