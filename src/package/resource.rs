@@ -1,10 +1,17 @@
-use std::io::{Read, Write};
+use std::{
+    io::{Read, Write},
+    str::FromStr,
+};
+
+use regex::Regex;
 
 /// Represents image file, saved in .pkpass package
 #[derive(Debug)]
 pub struct Resource {
-    /// Type of image
+    /// Type of image (represents file name)
     image_type: Type,
+
+    /// File buffer
     buffer: Vec<u8>,
 }
 
@@ -51,6 +58,31 @@ pub enum Version {
     Size3X,
 }
 
+// To String
+impl ToString for Version {
+    fn to_string(&self) -> String {
+        match self {
+            Version::Standard => "".into(),
+            Version::Size2X => "@2x".into(),
+            Version::Size3X => "@3x".into(),
+        }
+    }
+}
+
+// From String
+impl FromStr for Version {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "" => Ok(Version::Standard),
+            "@2x" => Ok(Version::Size2X),
+            "@3x" => Ok(Version::Size3X),
+            _ => Err(()),
+        }
+    }
+}
+
 /// Type of image.
 ///
 /// * The background image (background.png) is displayed behind the entire front of the pass. The expected dimensions are 180 x 220 points. The image is cropped slightly on all sides and blurred. Depending on the image, you can often provide an image at a smaller size and let it be scaled up, because the blur effect hides details. This lets you reduce the file size without a noticeable difference in the pass.
@@ -77,6 +109,59 @@ pub enum Type {
     Thumbnail(Version),
 }
 
+impl ToString for Type {
+    fn to_string(&self) -> String {
+        match self {
+            Type::Background(v) => format!("background{}.png", v.to_string()),
+            Type::Footer(v) => format!("footer{}.png", v.to_string()),
+            Type::Icon(v) => format!("icon{}.png", v.to_string()),
+            Type::Logo(v) => format!("logo{}.png", v.to_string()),
+            Type::Strip(v) => format!("strip{}.png", v.to_string()),
+            Type::Thumbnail(v) => format!("thumbnail{}.png", v.to_string()),
+        }
+    }
+}
+
+impl FromStr for Type {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // Note: format field unused
+        let re = Regex::new(r"(?P<type>\w+)(?P<version>@\dx)?\.(?P<format>png)").unwrap();
+        let captures = re.captures(&s);
+
+        // Extract captures
+        if let Some(captures) = captures {
+            // Extract version
+            let version = if let Some(version) = captures.name("version") {
+                version
+                    .as_str()
+                    .parse::<Version>()
+                    .unwrap_or(Version::Standard)
+            } else {
+                Version::Standard
+            };
+
+            if let Ok(image_type_str) = captures["type"].parse::<String>() {
+                // Match type & version
+                match image_type_str.as_str() {
+                    "background" => Ok(Type::Background(version)),
+                    "footer" => Ok(Type::Footer(version)),
+                    "icon" => Ok(Type::Icon(version)),
+                    "logo" => Ok(Type::Logo(version)),
+                    "strip" => Ok(Type::Strip(version)),
+                    "thumbnail" => Ok(Type::Thumbnail(version)),
+                    _ => Err(()),
+                }
+            } else {
+                Err(())
+            }
+        } else {
+            Err(())
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -91,5 +176,23 @@ mod tests {
 
         assert_eq!(resource.buffer.len(), 2048);
         assert_eq!(resource.get_type(), Type::Icon(Version::Standard));
+    }
+
+    #[test]
+    fn check_type_string() {
+        let t = Type::Footer(Version::Standard);
+        assert_eq!("footer.png", t.to_string());
+
+        let t = Type::Logo(Version::Size2X);
+        assert_eq!("logo@2x.png", t.to_string());
+    }
+
+    #[test]
+    fn check_type_from_string() {
+        let t = "footer.png".parse::<Type>().unwrap();
+        assert_eq!(Type::Footer(Version::Standard), t);
+
+        let t = Type::from_str("logo@2x.png").unwrap();
+        assert_eq!(Type::Logo(Version::Size2X), t);
     }
 }

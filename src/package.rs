@@ -2,20 +2,27 @@ use std::io::{Seek, Write};
 
 use crate::pass::Pass;
 
+use self::resource::Resource;
+
 pub mod resource;
 
 /// Pass Package, contains information about pass.json, images, manifest.json and signature.
 pub struct Package {
     /// Represents pass.json
     pub pass: Pass,
+
+    /// Resources (image files)
+    pub resources: Vec<Resource>,
     // TODO: signature
-    // TODO: resources
 }
 
 impl Package {
     /// Create new package
     pub fn new(pass: Pass) -> Self {
-        Self { pass }
+        Self {
+            pass,
+            resources: vec![],
+        }
     }
 
     /// Read package from file
