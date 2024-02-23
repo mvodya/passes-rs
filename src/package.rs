@@ -2,6 +2,8 @@ use std::io::{Seek, Write};
 
 use crate::pass::Pass;
 
+pub mod resource;
+
 /// Pass Package, contains information about pass.json, images, manifest.json and signature.
 pub struct Package {
     /// Represents pass.json
