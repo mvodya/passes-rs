@@ -158,7 +158,7 @@ pub struct Pass {
     #[serde(flatten)]
     pub fields: fields::Type,
     // TODO: UserInfo
-    // custom JSOM
+    // custom JSON
 }
 
 impl Pass {
@@ -601,6 +601,7 @@ mod tests {
 fn _is_false(b: &bool) -> bool {
     !b
 }
+
 // For serde skipping - if boolean true
 fn _is_true(b: &bool) -> bool {
     *b
