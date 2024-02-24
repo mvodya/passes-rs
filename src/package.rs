@@ -1,4 +1,4 @@
-use std::io::{Seek, Write};
+use std::io::{Read, Seek, Write};
 
 use crate::pass::Pass;
 
@@ -49,11 +49,32 @@ impl Package {
             .pass
             .make_json()
             .expect("Error while building pass.json");
-        zip.write(pass_json.as_bytes())
+        zip.write_all(pass_json.as_bytes())
             .expect("Error while writing pass.json in zip");
+
+        // Adding each resource files to zip
+        for resource in &self.resources {
+            zip.start_file(resource.filename(), options)
+                .expect("Error while creating resource file in zip");
+            zip.write_all(resource.as_bytes())
+                .expect("Error while writing resource file in zip");
+        }
 
         zip.finish().expect("Error while saving zip");
 
+        Ok(())
+    }
+
+    /// Adding image file to package.
+    /// Reading file to internal buffer storage.
+    pub fn add_resource<R: Read>(
+        &mut self,
+        image_type: resource::Type,
+        mut reader: R,
+    ) -> Result<(), &'static str> {
+        let mut resource = Resource::new(image_type);
+        std::io::copy(&mut reader, &mut resource).expect("Error while reading resource");
+        self.resources.push(resource);
         Ok(())
     }
 }
