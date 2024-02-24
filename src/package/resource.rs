@@ -54,8 +54,7 @@ impl Write for Resource {
 // Writing resource data
 impl Read for Resource {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
-        buf.to_vec().write_all(&self.buffer)?;
-        Ok(self.buffer.len())
+        buf.as_mut().write(&self.buffer)
     }
 }
 
