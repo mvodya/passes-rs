@@ -24,21 +24,30 @@ impl Resource {
         }
     }
 
-    // Get resource type
-    pub fn get_type(self) -> Type {
-        self.image_type
+    /// Get resource data
+    pub fn as_bytes(&self) -> &[u8] {
+        self.buffer.as_slice()
+    }
+
+    // Get resource file name
+    pub fn filename(&self) -> String {
+        self.image_type.to_string()
+    }
+
+    /// Get resource type
+    pub fn get_type(&self) -> Type {
+        self.image_type.clone()
     }
 }
 
 // Reading resource data
 impl Write for Resource {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        self.buffer = buf.to_vec();
-        Ok(self.buffer.len())
+        self.buffer.write(buf)
     }
 
     fn flush(&mut self) -> std::io::Result<()> {
-        Ok(())
+        self.buffer.flush()
     }
 }
 
@@ -51,7 +60,7 @@ impl Read for Resource {
 }
 
 /// Image size versions
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Version {
     Standard,
     Size2X,
@@ -93,7 +102,7 @@ impl FromStr for Version {
 /// * On iPhone 6 and 6 Plus The allotted space is 375 x 98 points for event tickets, 375 x 144 points for gift cards and coupons, and 375 x 123 in all other cases.
 /// * On prior hardware The allotted space is 320 x 84 points for event tickets, 320 x 110 points for other pass styles with a square barcode on devices with 3.5 inch screens, and 320 x 123 in all other cases.
 /// * The thumbnail image (thumbnail.png) displayed next to the fields on the front of the pass. The allotted space is 90 x 90 points. The aspect ratio should be in the range of 2:3 to 3:2, otherwise the image is cropped.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Type {
     /// The background image (background.png)
     Background(Version),
