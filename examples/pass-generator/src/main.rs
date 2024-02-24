@@ -1,3 +1,4 @@
+use passes::package::resource;
 use passes::package::Package;
 use passes::pass::{PassBuilder, PassConfig};
 
@@ -21,7 +22,16 @@ fn main() {
     println!("pass.json: {}", json);
 
     // Creating package
-    let package = Package::new(pass);
+    let mut package = Package::new(pass);
+
+    let image_path = Path::new("template_app_icon.png");
+    let file = match File::open(&image_path) {
+        Err(why) => panic!("couldn't create {}: {}", image_path.display(), why),
+        Ok(file) => file,
+    };
+    package
+        .add_resource(resource::Type::Logo(resource::Version::Standard), file)
+        .unwrap();
 
     // Save package as .pkpass
     let path = Path::new("test_pass.pkpass");
