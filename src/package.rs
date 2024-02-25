@@ -5,6 +5,7 @@ use crate::pass::Pass;
 use self::resource::Resource;
 
 pub mod resource;
+pub mod manifest;
 
 /// Pass Package, contains information about pass.json, images, manifest.json and signature.
 pub struct Package {
