@@ -167,6 +167,12 @@ impl Pass {
         let json = serde_json::to_string_pretty(&self)?;
         Ok(json)
     }
+
+    // Build pass (pass.json) from json data
+    pub fn from_json(data: &str) -> Result<Self, serde_json::Error> {
+        let pass: Pass = serde_json::from_str(data)?;
+        Ok(pass)
+    }
 }
 
 /// Builder for pass (represents pass.json file)
@@ -368,7 +374,7 @@ mod tests {
         assert_eq!(json_expected, json);
 
         // Deserialization test
-        let pass: Pass = serde_json::from_str(json_expected).unwrap();
+        let pass: Pass = Pass::from_json(json_expected).unwrap();
         let json = pass.make_json().unwrap();
         assert_eq!(json_expected, json);
     }
@@ -591,7 +597,7 @@ mod tests {
         assert_eq!(json_expected, json);
 
         // Deserialization test
-        let pass: Pass = serde_json::from_str(json_expected).unwrap();
+        let pass: Pass = Pass::from_json(json_expected).unwrap();
         let json = pass.make_json().unwrap();
         assert_eq!(json_expected, json);
     }

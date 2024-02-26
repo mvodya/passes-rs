@@ -1,4 +1,7 @@
-use std::io::{Read, Seek, Write};
+use std::{
+    io::{Read, Seek, Write},
+    str::FromStr,
+};
 
 use crate::pass::Pass;
 
@@ -26,9 +29,47 @@ impl Package {
         }
     }
 
-    /// Read package from file
-    pub fn read_file(_path: String) -> Self {
-        todo!(".pkpass reader is not implemented yet!")
+    /// Read compressed package (.pkpass) from file.
+    /// Use for creating .pkpass file from template.
+    pub fn read<R: Read + Seek>(reader: R) -> Result<Self, &'static str> {
+        // Read .pkpass as zip
+        let mut zip = zip::ZipArchive::new(reader).expect("Error unzipping pkpass");
+
+        let mut pass: Option<Pass> = None;
+        let mut resources = Vec::<Resource>::new();
+
+        for i in 0..zip.len() {
+            // Get file name
+            let mut file = zip.by_index(i).unwrap();
+            let filename = file.name();
+            // Read pass.json file
+            if filename == "pass.json" {
+                let mut buf = String::new();
+                file.read_to_string(&mut buf)
+                    .expect("Error while reading pass.json");
+                pass = Some(Pass::from_json(&buf).expect("Error while parsing pass.json"));
+                continue;
+            }
+            // Read resource files
+            match resource::Type::from_str(filename) {
+                // Match resource type by template
+                Ok(t) => {
+                    let mut resource = Resource::new(t);
+                    std::io::copy(&mut file, &mut resource)
+                        .expect("Error while reading resource file");
+                    resources.push(resource);
+                }
+                // Skip unknown files
+                Err(_) => {}
+            }
+        }
+
+        // Check is pass.json successfully read
+        if let Some(pass) = pass {
+            Ok(Self { pass, resources })
+        } else {
+            Err("pass.json is missed in package file")
+        }
     }
 
     /// Sign package with Apple Developer certificate
@@ -155,5 +196,50 @@ mod tests {
             .read_to_string(&mut packaged_pass_json);
 
         assert_eq!(expected_pass_json, packaged_pass_json);
+    }
+
+    #[test]
+    fn read_package() {
+        let pass = PassBuilder::new(PassConfig {
+            organization_name: "Apple inc.".into(),
+            description: "Example pass".into(),
+            pass_type_identifier: "com.example.pass".into(),
+            team_identifier: "AA00AA0A0A".into(),
+            serial_number: "ABCDEFG1234567890".into(),
+        })
+        .logo_text("Test pass".into())
+        .build();
+        let expected_json = pass.make_json().unwrap();
+
+        // Create package with pass.json
+        let mut package = Package::new(pass);
+
+        // Add resources
+        let data = [0u8; 2048];
+        package
+            .add_resource(resource::Type::Icon(resource::Version::Standard), &data[..])
+            .unwrap();
+        package
+            .add_resource(resource::Type::Logo(resource::Version::Size3X), &data[..])
+            .unwrap();
+
+        // Save package as .pkpass
+        let mut buf = [0; 65536];
+        let writer = std::io::Cursor::new(&mut buf[..]);
+        package.write(writer).unwrap();
+
+        // Read .pkpass
+        let reader = std::io::Cursor::new(&mut buf[..]);
+        let package_read = Package::read(reader).unwrap();
+
+        // Check pass.json
+        let read_json = package_read.pass.make_json().unwrap();
+        assert_eq!(expected_json, read_json);
+
+        // Check assets
+        println!("{:?}", package.resources);
+        assert_eq!(2, package.resources.len());
+        assert_eq!("icon.png", package.resources.get(0).unwrap().filename());
+        assert_eq!("logo@3x.png", package.resources.get(1).unwrap().filename());
     }
 }
