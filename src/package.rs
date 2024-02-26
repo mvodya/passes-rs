@@ -2,10 +2,10 @@ use std::io::{Read, Seek, Write};
 
 use crate::pass::Pass;
 
-use self::resource::Resource;
+use self::{manifest::Manifest, resource::Resource};
 
-pub mod resource;
 pub mod manifest;
+pub mod resource;
 
 /// Pass Package, contains information about pass.json, images, manifest.json and signature.
 pub struct Package {
@@ -38,7 +38,9 @@ impl Package {
 
     /// Write compressed package.
     /// Use for creating .pkpass file
-    pub fn write<W: Write + Seek>(&self, writer: W) -> Result<(), &'static str> {
+    pub fn write<W: Write + Seek>(&mut self, writer: W) -> Result<(), &'static str> {
+        let mut manifest = Manifest::new();
+
         let mut zip = zip::ZipWriter::new(writer);
         let options =
             zip::write::FileOptions::default().compression_method(zip::CompressionMethod::Stored);
@@ -52,6 +54,7 @@ impl Package {
             .expect("Error while building pass.json");
         zip.write_all(pass_json.as_bytes())
             .expect("Error while writing pass.json in zip");
+        manifest.add_item("pass.json", pass_json.as_bytes());
 
         // Adding each resource files to zip
         for resource in &self.resources {
@@ -59,7 +62,18 @@ impl Package {
                 .expect("Error while creating resource file in zip");
             zip.write_all(resource.as_bytes())
                 .expect("Error while writing resource file in zip");
+            manifest.add_item(resource.filename().as_str(), resource.as_bytes());
         }
+
+        // Adding manifest.json to zip
+        zip.start_file("manifest.json", options)
+            .expect("Error while creating manifest.json in zip");
+        let manifest_json = manifest
+            .make_json()
+            .expect("Error while generating manifest file");
+        zip.write_all(manifest_json.as_bytes())
+            .expect("Error while writing manifest.json in zip");
+        manifest.add_item("manifest.json", manifest_json.as_bytes());
 
         zip.finish().expect("Error while saving zip");
 
@@ -117,7 +131,7 @@ mod tests {
 
         let expected_pass_json = pass.make_json().unwrap();
 
-        let package = Package::new(pass);
+        let mut package = Package::new(pass);
 
         // Save package as .pkpass
         let mut buf = [0; 65536];

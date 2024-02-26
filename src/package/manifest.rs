@@ -33,10 +33,15 @@ impl Manifest {
         }
     }
 
-    // Build JSON output for manifest (manifest.json)
+    /// Build JSON output for manifest (manifest.json)
     pub fn make_json(&self) -> Result<String, serde_json::Error> {
         let json = serde_json::to_string(&self)?;
         Ok(json)
+    }
+
+    /// Remove all items from Manifest
+    pub fn clear(&mut self) {
+        self.items.clear();
     }
 }
 
