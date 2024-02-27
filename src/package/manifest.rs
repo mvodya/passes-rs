@@ -1,5 +1,5 @@
+use openssl::sha::Sha1;
 use serde::{ser::SerializeMap, Serialize};
-use sha256::digest;
 
 /// Represents manifest.json file, contains SHA-256 of all .pkpass files.
 /// Only serialization supported! (TODO?)
@@ -18,10 +18,12 @@ impl Manifest {
 
     /// Add items & calculate SHA-256
     pub fn add_item(&mut self, path: &str, data: &[u8]) {
-        let checksum = digest(data);
+        let mut hasher = Sha1::new();
+        hasher.update(data);
+        let checksum = hasher.finish();
         let item = Item {
             path: path.to_string(),
-            checksum,
+            checksum: hex::encode(&checksum),
         };
         self.items.push(item);
     }
@@ -80,8 +82,7 @@ mod tests {
         manifest.add_item(path, example_data);
 
         let json = manifest.make_json().unwrap();
-        let json_expected =
-            r#"{"pass.json":"b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"}"#;
+        let json_expected = r#"{"pass.json":"2aae6c35c94fcfb415dbe95f408b9ce91ee846ed"}"#;
 
         assert_eq!(json_expected, json);
     }
@@ -97,7 +98,7 @@ mod tests {
         manifest.add_items(items);
 
         let json = manifest.make_json().unwrap();
-        let json_expected = r#"{"pass.json":"b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9","logo.png":"c8c42f4cc5a49127cd77fed32dd557e4aaf6f05b6157479dcdff9201b71e50e4","background.png":"0249ccddca5afa53c370e6167940ad89b146dcb1f66e8ffdbe1234cab4d0ecfd"}"#;
+        let json_expected = r#"{"pass.json":"2aae6c35c94fcfb415dbe95f408b9ce91ee846ed","logo.png":"e2507820ce1bd6d09669504e6a5536f7a3ccc94b","background.png":"05cc11980f5826d11c5c1292a4cd04ad11ddbf45"}"#;
 
         assert_eq!(json_expected, json);
     }
