@@ -590,7 +590,7 @@ mod tests {
       }
     ],
     "secondaryFields": [],
-    "transit_type": "PKTransitTypeAir"
+    "transitType": "PKTransitTypeAir"
   }
 }"#;
 

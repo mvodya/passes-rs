@@ -234,6 +234,7 @@ pub enum Type {
         pass_fields: Fields,
 
         /// (Required) The type of transit for a boarding pass. This key is invalid for other types of passes.
+        #[serde(rename = "transitType")]
         transit_type: TransitType,
     },
     /// Represents the groups of fields that display the information for a coupon.
@@ -492,7 +493,7 @@ mod tests {
         "value": "Some information here"
       }
     ],
-    "transit_type": "PKTransitTypeAir"
+    "transitType": "PKTransitTypeAir"
   }
 }"#;
         assert_eq!(json_expected, json);
