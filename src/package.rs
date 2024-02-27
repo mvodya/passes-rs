@@ -5,10 +5,11 @@ use std::{
 
 use crate::pass::Pass;
 
-use self::{manifest::Manifest, resource::Resource};
+use self::{manifest::Manifest, resource::Resource, sign::SignConfig};
 
 pub mod manifest;
 pub mod resource;
+pub mod sign;
 
 /// Pass Package, contains information about pass.json, images, manifest.json and signature.
 pub struct Package {
@@ -17,7 +18,9 @@ pub struct Package {
 
     /// Resources (image files)
     pub resources: Vec<Resource>,
-    // TODO: signature
+
+    // Certificates for signing package
+    pub sign_config: Option<SignConfig>,
 }
 
 impl Package {
@@ -26,6 +29,7 @@ impl Package {
         Self {
             pass,
             resources: vec![],
+            sign_config: None,
         }
     }
 
@@ -66,15 +70,19 @@ impl Package {
 
         // Check is pass.json successfully read
         if let Some(pass) = pass {
-            Ok(Self { pass, resources })
+            Ok(Self {
+                pass,
+                resources,
+                sign_config: None,
+            })
         } else {
             Err("pass.json is missed in package file")
         }
     }
 
-    /// Sign package with Apple Developer certificate
-    pub fn sign(_cert: String) -> Self {
-        todo!("signing is not implemented yet!")
+    /// Add certificates for signing package
+    pub fn add_certificates(&mut self, config: SignConfig) {
+        self.sign_config = Some(config);
     }
 
     /// Write compressed package.
@@ -115,6 +123,36 @@ impl Package {
         zip.write_all(manifest_json.as_bytes())
             .expect("Error while writing manifest.json in zip");
         manifest.add_item("manifest.json", manifest_json.as_bytes());
+
+        // If SignConfig is provided, make signature
+        if let Some(sign_config) = &self.sign_config {
+            // Make signature without signing content
+            let flags = openssl::pkcs7::Pkcs7Flags::DETACHED;
+            // Add WWDR cert to chain
+            let mut certs = openssl::stack::Stack::new().expect("Error while prepare certificate");
+            certs
+                .push(sign_config.cert.clone())
+                .expect("Error while prepare certificate");
+
+            // Signing
+            let pkcs7 = openssl::pkcs7::Pkcs7::sign(
+                &sign_config.sign_cert,
+                &sign_config.sign_key,
+                &certs,
+                manifest_json.as_bytes(),
+                flags,
+            )
+            .expect("Error while signing package");
+
+            // Generate signature
+            let signature_data = pkcs7.to_der().expect("Error while generating signature");
+
+            // Adding signature to zip
+            zip.start_file("signature", options)
+                .expect("Error while creating signature in zip");
+            zip.write_all(&signature_data)
+                .expect("Error while writing signature in zip");
+        }
 
         zip.finish().expect("Error while saving zip");
 
