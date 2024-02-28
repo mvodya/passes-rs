@@ -439,6 +439,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pass-generator-dal"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "passes",
+]
+
+[[package]]
 name = "passes"
 version = "0.1.0"
 dependencies = [

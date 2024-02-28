@@ -1,4 +1,4 @@
-workspace = { members = ["examples/pass-generator"] }
+workspace = { members = ["examples/pass-generator", "examples/pass-generator-dal"] }
 [package]
 name = "passes"
 description = "Rust library for generate Apple Wallet Passes for iOS, WatchOS, MacOS."
