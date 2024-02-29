@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
     - name: publish library
       run: cargo publish  --verbose
       env:
