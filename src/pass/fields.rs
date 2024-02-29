@@ -67,7 +67,7 @@ impl Content {
 #[serde(rename_all = "camelCase")]
 pub struct ContentOptions {
     /// The value of the field, including HTML markup for links.
-    /// The only supported tag is the <a> tag and its href attribute.
+    /// The only supported tag is the `<a>` tag and its href attribute.
     /// The value of this key overrides that of the value key.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]

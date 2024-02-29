@@ -55,7 +55,7 @@ pub struct Pass {
     pub config: PassConfig,
 
     /// An identifier the system uses to group related boarding passes or event tickets.
-    /// Wallet displays passes with the same [grouping_identifier](Pass::grouping_identifier), [pass_type_identifier](Pass::pass_type_identifier), and type as a group.
+    /// Wallet displays passes with the same [grouping_identifier](Pass::grouping_identifier), [pass_type_identifier](PassConfig::pass_type_identifier), and type as a group.
     /// Use this identifier to group passes that are tightly related, such as boarding passes for different connections on the same trip.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -256,7 +256,7 @@ impl PassBuilder {
         self
     }
 
-    /// Adding [web_service_url](Pass::web_service_url)
+    /// Adding [web_service_url](WebService::web_service_url)
     pub fn web_service(mut self, web_service: WebService) -> PassBuilder {
         self.pass.web_service = Some(web_service);
         self

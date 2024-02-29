@@ -4,7 +4,7 @@ use serde::{ser::SerializeMap, Serialize};
 /// Represents manifest.json file, contains SHA-256 of all .pkpass files.
 /// Only serialization supported! (TODO?)
 ///
-/// https://developer.apple.com/documentation/walletorders/building_a_distributable_order_package
+/// <https://developer.apple.com/documentation/walletorders/building_a_distributable_order_package>
 pub struct Manifest {
     /// All manifest files with SHA-256
     items: Vec<Item>,

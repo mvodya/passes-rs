@@ -3,7 +3,7 @@ use is_empty::IsEmpty;
 use serde::{Deserialize, Serialize};
 
 /// Machine-readable metadata the system uses to offer a pass and suggest related actions.
-/// https://developer.apple.com/documentation/walletpasses/semantictags
+/// <https://developer.apple.com/documentation/walletpasses/semantictags>
 #[derive(Serialize, Deserialize, Debug, IsEmpty)]
 #[serde(rename_all = "camelCase")]
 pub struct SemanticTags {
