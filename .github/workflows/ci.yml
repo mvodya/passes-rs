@@ -10,18 +10,13 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  test:
-    name: Test suite
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - run: cargo test --verbose
-
-  build:
+  build-and-test:
+    name: Build library
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
+    - name: build library
     - run: cargo build --verbose
+    - name: test library
+    - run: cargo test --verbose
