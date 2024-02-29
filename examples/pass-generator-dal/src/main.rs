@@ -1,10 +1,12 @@
-use passes::package::resource;
-use passes::package::sign::SignConfig;
-use passes::package::Package;
-use passes::pass::barcode::{Barcode, BarcodeFormat};
-use passes::pass::fields::{self, Content, ContentOptions};
-use passes::pass::semantic_tags::{SemanticTagLocation, SemanticTagSeat, SemanticTags};
-use passes::pass::{PassBuilder, PassConfig};
+use passes::barcode::{Barcode, BarcodeFormat};
+use passes::fields;
+use passes::resource;
+use passes::semantic_tags;
+use passes::sign;
+use passes::sign::SignConfig;
+use passes::visual_appearance;
+use passes::Package;
+use passes::{PassBuilder, PassConfig};
 
 use chrono::prelude::*;
 
@@ -20,10 +22,10 @@ fn main() {
         team_identifier: "AA00AA0A0A".into(),
         serial_number: "ABCDEFG1234567890".into(),
     })
-    .appearance(passes::pass::visual_appearance::VisualAppearance {
-        label_color: passes::pass::visual_appearance::Color::white(),
-        foreground_color: passes::pass::visual_appearance::Color::white(),
-        background_color: passes::pass::visual_appearance::Color::new(0, 143, 212),
+    .appearance(visual_appearance::VisualAppearance {
+        label_color: visual_appearance::Color::white(),
+        foreground_color: visual_appearance::Color::white(),
+        background_color: visual_appearance::Color::new(0, 143, 212),
     })
     .fields(
         fields::Type::BoardingPass {
@@ -32,58 +34,58 @@ fn main() {
             },
             transit_type: fields::TransitType::Air,
         }
-        .add_primary_field(Content::new(
+        .add_primary_field(fields::Content::new(
             "from",
             "OAK",
-            ContentOptions {
+            fields::ContentOptions {
                 label: String::from("Oak island").into(),
                 ..Default::default()
             },
         ))
-        .add_primary_field(Content::new(
+        .add_primary_field(fields::Content::new(
             "to",
             "MVK",
-            ContentOptions {
+            fields::ContentOptions {
                 label: String::from("Маврикий").into(),
                 ..Default::default()
             },
         ))
-        .add_auxiliary_field(Content::new(
+        .add_auxiliary_field(fields::Content::new(
             "seq",
             "457",
-            ContentOptions {
+            fields::ContentOptions {
                 label: String::from("seq").into(),
                 ..Default::default()
             },
         ))
-        .add_auxiliary_field(Content::new(
+        .add_auxiliary_field(fields::Content::new(
             "boards",
             "18:46",
-            ContentOptions {
+            fields::ContentOptions {
                 label: String::from("scheduled").into(),
                 ..Default::default()
             },
         ))
-        .add_auxiliary_field(Content::new(
+        .add_auxiliary_field(fields::Content::new(
             "seat",
             "20A",
-            ContentOptions {
+            fields::ContentOptions {
                 label: String::from("seat").into(),
                 ..Default::default()
             },
         ))
-        .add_auxiliary_field(Content::new(
+        .add_auxiliary_field(fields::Content::new(
             "group",
             "A",
-            ContentOptions {
+            fields::ContentOptions {
                 label: String::from("group").into(),
                 ..Default::default()
             },
         ))
-        .add_secondary_field(Content::new(
+        .add_secondary_field(fields::Content::new(
             "passenger",
             "John Cena",
-            ContentOptions {
+            fields::ContentOptions {
                 label: String::from("passenger").into(),
                 ..Default::default()
             },
@@ -123,10 +125,10 @@ fn main() {
     )
     .relevant_date(Utc.with_ymd_and_hms(2024, 02, 28, 0, 0, 0).unwrap())
     .expiration_date(Utc.with_ymd_and_hms(2024, 02, 29, 0, 0, 0).unwrap())
-    .semantics(SemanticTags {
+    .semantics(semantic_tags::SemanticTags {
         airline_code: String::from("DL 1132").into(),
         departure_gate: String::from("21").into(),
-        departure_location: SemanticTagLocation {
+        departure_location: semantic_tags::SemanticTagLocation {
             latitude: 43.3948533,
             longitude: 132.1451673,
         }
@@ -143,7 +145,7 @@ fn main() {
             .with_ymd_and_hms(2024, 02, 29, 23, 20, 0)
             .unwrap()
             .into(),
-        seats: vec![SemanticTagSeat {
+        seats: vec![semantic_tags::SemanticTagSeat {
             seat_identifier: String::from("20A").into(),
             seat_number: String::from("A").into(),
             seat_row: String::from("20").into(),
@@ -203,12 +205,8 @@ fn main() {
     let mut sign_cert_key_data = Vec::new();
     std::io::Read::read_to_end(&mut file_sign_key_cert, &mut sign_cert_key_data).unwrap();
 
-    let sign_config = SignConfig::new(
-        passes::package::sign::WWDR::G4,
-        &sign_cert_data,
-        &sign_cert_key_data,
-    )
-    .unwrap();
+    let sign_config =
+        SignConfig::new(sign::WWDR::G4, &sign_cert_data, &sign_cert_key_data).unwrap();
     package.add_certificates(sign_config);
 
     // Save package as .pkpass
