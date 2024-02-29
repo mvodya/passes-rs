@@ -1,12 +1,20 @@
-workspace = { members = ["examples/pass-generator", "examples/pass-generator-dal"] }
 [package]
 name = "passes"
 description = "Rust library for generate Apple Wallet Passes for iOS, WatchOS, MacOS."
 version = "0.1.0"
 edition = "2021"
 authors = ["Mark Vodyanitskiy <mvodya@icloud.com>"]
+license = "MIT"
+readme = "README.md"
+include = ["src/", "LICENSE", "README.md"]
+keywords = ["passkit", "wallet", "apple"]
+categories = ["parsing"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[workspace]
+members = [
+  "examples/pass-generator",
+  "examples/pass-generator-dal"
+]
 
 [dependencies]
 chrono = "0.4.34"
