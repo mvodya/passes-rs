@@ -162,13 +162,70 @@ pub struct Pass {
 }
 
 impl Pass {
-    // Build JSON output for pass (pass.json)
+    /// Build JSON output for pass (pass.json)
+    ///
+    /// ```
+    /// use passes::{PassConfig, PassBuilder};
+    ///
+    /// let pass = PassBuilder::new(PassConfig {
+    ///     organization_name: String::from("Apple inc."),
+    ///     description: String::from("Example pass"),
+    ///     pass_type_identifier: String::from("com.example.pass"),
+    ///     team_identifier: String::from("AA00AA0A0A"),
+    ///     serial_number: String::from("ABCDEFG1234567890"),
+    /// })
+    /// .build();
+    ///
+    /// let json = pass.make_json().unwrap();
+    ///
+    /// let json_expected = r#"{
+    ///   "formatVersion": 1,
+    ///   "organizationName": "Apple inc.",
+    ///   "description": "Example pass",
+    ///   "passTypeIdentifier": "com.example.pass",
+    ///   "teamIdentifier": "AA00AA0A0A",
+    ///   "serialNumber": "ABCDEFG1234567890",
+    ///   "generic": {
+    ///     "auxiliaryFields": [],
+    ///     "backFields": [],
+    ///     "headerFields": [],
+    ///     "primaryFields": [],
+    ///     "secondaryFields": []
+    ///   }
+    /// }"#;
+    ///
+    /// assert_eq!(json_expected, json);
+    /// ```
     pub fn make_json(&self) -> Result<String, serde_json::Error> {
         let json = serde_json::to_string_pretty(&self)?;
         Ok(json)
     }
 
-    // Build pass (pass.json) from json data
+    /// Build pass (pass.json) from json data
+    ///
+    /// ```
+    /// use passes::Pass;
+    ///
+    /// let json_expected = r#"{
+    ///   "formatVersion": 1,
+    ///   "organizationName": "Apple inc.",
+    ///   "description": "Example pass",
+    ///   "passTypeIdentifier": "com.example.pass",
+    ///   "teamIdentifier": "AA00AA0A0A",
+    ///   "serialNumber": "ABCDEFG1234567890",
+    ///   "generic": {
+    ///     "auxiliaryFields": [],
+    ///     "backFields": [],
+    ///     "headerFields": [],
+    ///     "primaryFields": [],
+    ///     "secondaryFields": []
+    ///   }
+    /// }"#;
+    ///
+    /// let pass: Pass = Pass::from_json(json_expected).unwrap();
+    /// let json = pass.make_json().unwrap();
+    /// assert_eq!(json_expected, json);
+    /// ```
     pub fn from_json(data: &str) -> Result<Self, serde_json::Error> {
         let pass: Pass = serde_json::from_str(data)?;
         Ok(pass)
@@ -233,6 +290,19 @@ impl PassBuilder {
     }
 
     /// Adding [relevant_date](Pass::relevant_date)
+    ///
+    /// ```
+    /// use chrono::prelude::*;
+    /// use passes::{PassBuilder, PassConfig};
+    ///
+    /// let pass = PassBuilder::new(PassConfig {
+    ///     organization_name: String::from("Apple inc."),
+    ///     description: String::from("Example pass"),
+    ///     pass_type_identifier: String::from("com.example.pass"),
+    ///     team_identifier: String::from("AA00AA0A0A"),
+    ///     serial_number: String::from("ABCDEFG1234567890"),
+    /// }).relevant_date(Utc.with_ymd_and_hms(2024, 02, 07, 0, 0, 0).unwrap());
+    /// ```
     pub fn relevant_date(mut self, field: DateTime<Utc>) -> PassBuilder {
         self.pass.relevant_date = Some(field);
         self
@@ -315,12 +385,67 @@ impl PassBuilder {
     }
 
     /// Adding [semantics](Pass::semantics)
+    ///
+    /// ```
+    /// use passes::{PassBuilder, PassConfig, semantic_tags};
+    ///
+    /// let pass = PassBuilder::new(PassConfig {
+    ///     organization_name: String::from("Apple inc."),
+    ///     description: String::from("Example pass"),
+    ///     pass_type_identifier: String::from("com.example.pass"),
+    ///     team_identifier: String::from("AA00AA0A0A"),
+    ///     serial_number: String::from("ABCDEFG1234567890"),
+    /// }).semantics(semantic_tags::SemanticTags {
+    ///     airline_code: String::from("EX123").into(),
+    ///     departure_location: semantic_tags::SemanticTagLocation {
+    ///         latitude: 43.3948533,
+    ///         longitude: 132.1451673,
+    ///     }
+    ///     .into(),
+    ///     ..Default::default()
+    /// });
+    /// ```
     pub fn semantics(mut self, field: SemanticTags) -> PassBuilder {
         self.pass.semantics = field;
         self
     }
 
     /// Adding [fields](Pass::fields)
+    ///
+    /// ```
+    /// use passes::{PassBuilder, PassConfig, fields};
+    ///
+    /// let pass = PassBuilder::new(PassConfig {
+    ///     organization_name: String::from("Apple inc."),
+    ///     description: String::from("Example pass"),
+    ///     pass_type_identifier: String::from("com.example.pass"),
+    ///     team_identifier: String::from("AA00AA0A0A"),
+    ///     serial_number: String::from("ABCDEFG1234567890"),
+    /// }).fields(
+    ///     fields::Type::BoardingPass {
+    ///         pass_fields: fields::Fields {
+    ///             ..Default::default()
+    ///         },
+    ///         transit_type: fields::TransitType::Air,
+    ///     }
+    ///     .add_header_field(fields::Content::new(
+    ///         "serial",
+    ///         "1122",
+    ///         fields::ContentOptions {
+    ///             label: String::from("SERIAL").into(),
+    ///             ..Default::default()
+    ///         },
+    ///     ))
+    ///     .add_primary_field(fields::Content::new(
+    ///     "from",
+    ///     "RKSI",
+    ///     fields::ContentOptions {
+    ///         label: String::from("FROM").into(),
+    ///         text_alignment: fields::TextAlignment::Right.into(),
+    ///         ..Default::default()
+    ///     },
+    /// )));
+    /// ```
     pub fn fields(mut self, field: fields::Type) -> PassBuilder {
         self.pass.fields = field;
         self
