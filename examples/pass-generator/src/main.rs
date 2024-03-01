@@ -1,7 +1,4 @@
-use passes::resource;
-use passes::sign::SignConfig;
-use passes::Package;
-use passes::{PassBuilder, PassConfig};
+use passes::{resource, sign, Package, PassBuilder, PassConfig};
 
 use std::fs::File;
 use std::path::Path;
@@ -55,7 +52,8 @@ fn main() {
     std::io::Read::read_to_end(&mut file_sign_key_cert, &mut sign_cert_key_data).unwrap();
 
     let sign_config =
-        SignConfig::new(passes::sign::WWDR::G4, &sign_cert_data, &sign_cert_key_data).unwrap();
+        sign::SignConfig::new(sign::WWDR::G4, &sign_cert_data, &sign_cert_key_data)
+            .unwrap();
     package.add_certificates(sign_config);
 
     // Save package as .pkpass
