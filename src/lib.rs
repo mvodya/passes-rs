@@ -1,11 +1,11 @@
 //! Rust library for generate Apple Wallet Passes for iOS, WatchOS, MacOS.
 //!
 //! # Quick start
-//! [Pass](Pass) represent the displayable fields (pass.json), [Package](Package)
-//! includes [Pass](Pass) and [Resource's](Resource) (images, such as logo, background, etc.) and
+//! [Pass] represent the displayable fields (pass.json), [Package]
+//! includes [Pass] and [Resource's](resource::Resource) (images, such as logo, background, etc.) and
 //! represent pass package (.pkpass file).
 //!
-//! Before making [Package](Package), you need to create [Pass](Pass) structure, then include pass (and required resources) to
+//! Before making [Package], you need to create [Pass] structure, then include pass (and required resources) to
 //! package.
 //!
 //! ```
