@@ -8,10 +8,12 @@ pub struct Barcode {
     pub message: String,
 
     /// (Required) The format of the barcode.
+    ///
     /// The barcode format PKBarcodeFormatCode128 isn’t supported for watchOS.
     pub format: BarcodeFormat,
 
     /// The text to display near the barcode.
+    ///
     /// For example, a human-readable version of the barcode data in case the barcode doesn’t scan.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -36,19 +38,19 @@ impl Default for Barcode {
 /// Barcode format
 #[derive(Serialize, Deserialize, Debug)]
 pub enum BarcodeFormat {
-    /// QR
+    /// QR - <https://en.wikipedia.org/wiki/QR_code>
     #[serde(rename = "PKBarcodeFormatQR")]
     QR,
 
-    /// PDF417
+    /// PDF417 - <https://en.wikipedia.org/wiki/PDF417>
     #[serde(rename = "PKBarcodeFormatPDF417")]
     PDF417,
 
-    /// Aztec
+    /// Aztec - <https://en.wikipedia.org/wiki/Aztec_Code>
     #[serde(rename = "PKBarcodeFormatAztec")]
     Aztec,
 
-    /// Code128
+    /// Code128 - <https://en.wikipedia.org/wiki/Code_128>
     #[serde(rename = "PKBarcodeFormatCode128")]
     Code128,
 }

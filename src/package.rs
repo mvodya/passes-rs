@@ -34,6 +34,7 @@ impl Package {
     }
 
     /// Read compressed package (.pkpass) from file.
+    ///
     /// Use for creating .pkpass file from template.
     pub fn read<R: Read + Seek>(reader: R) -> Result<Self, &'static str> {
         // Read .pkpass as zip
@@ -86,6 +87,7 @@ impl Package {
     }
 
     /// Write compressed package.
+    ///
     /// Use for creating .pkpass file
     pub fn write<W: Write + Seek>(&mut self, writer: W) -> Result<(), &'static str> {
         let mut manifest = Manifest::new();
@@ -160,6 +162,7 @@ impl Package {
     }
 
     /// Adding image file to package.
+    ///
     /// Reading file to internal buffer storage.
     pub fn add_resource<R: Read>(
         &mut self,

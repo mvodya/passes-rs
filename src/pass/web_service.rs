@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Represents Web Service
+///
 /// See [Apple documentation](https://developer.apple.com/documentation/walletpasses/adding_a_web_service_to_update_passes)
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]

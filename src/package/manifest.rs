@@ -2,7 +2,8 @@ use openssl::sha::Sha1;
 use serde::{ser::SerializeMap, Serialize};
 
 /// Represents manifest.json file, contains SHA-256 of all .pkpass files.
-/// Only serialization supported! (TODO?)
+///
+/// Only serialization supported!
 ///
 /// <https://developer.apple.com/documentation/walletorders/building_a_distributable_order_package>
 pub struct Manifest {

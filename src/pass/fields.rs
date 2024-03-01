@@ -67,13 +67,16 @@ impl Content {
 #[serde(rename_all = "camelCase")]
 pub struct ContentOptions {
     /// The value of the field, including HTML markup for links.
+    ///
     /// The only supported tag is the `<a>` tag and its href attribute.
+    ///
     /// The value of this key overrides that of the value key.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attributed_value: Option<String>,
 
     /// A format string for the alert text to display when the pass is updated.
+    ///
     /// The format string must contain the escape %@, which is replaced with the field’s new value.
     /// For example, “Gate changed to %@”.
     ///
@@ -90,6 +93,7 @@ pub struct ContentOptions {
     pub currency_code: Option<String>,
 
     /// The data detectors to apply to the value of a field on the back of the pass.
+    ///
     /// The default is to apply all data detectors. To use no data detectors, specify an empty array.
     ///
     /// You don’t use data detectors for fields on the front of the pass.
@@ -105,6 +109,7 @@ pub struct ContentOptions {
     pub date_style: Option<DateStyle>,
 
     /// A Boolean value that controls the time zone for the time and date to display in the field.
+    ///
     /// The default value is false, which displays the time and date using the current device’s time zone.
     /// Otherwise, the time and date appear in the time zone associated with the date and time of value.
     ///
@@ -113,7 +118,8 @@ pub struct ContentOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ignores_time_zone: Option<bool>,
 
-    /// A Boolean value that controls whether the date appears as a relative date.
+    /// A Boolean value that controls whether the date appears as a relative date.\
+    ///
     /// The default value is false, which displays the date as an absolute date.
     ///
     /// This key doesn’t affect the pass relevance calculation.
@@ -127,12 +133,14 @@ pub struct ContentOptions {
     pub label: Option<String>,
 
     /// The style of the number to display in the field.
+    ///
     /// Formatter styles have the same meaning as the formats with corresponding names in NumberFormatter.Style.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub number_style: Option<NumberStyle>,
 
     /// The alignment for the content of a field. The default is natural alignment, which aligns the text based on its script direction.
+    ///
     /// This key is invalid for primary and back fields.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -143,7 +151,8 @@ pub struct ContentOptions {
     pub time_style: Option<DateStyle>,
 
     /// Semantic tags
-    // Metadata the system uses to offer a pass and suggest related actions.
+    ///
+    /// Metadata the system uses to offer a pass and suggest related actions.
     #[serde(default)]
     #[serde(skip_serializing_if = "SemanticTags::is_empty")]
     pub semantics: SemanticTags,

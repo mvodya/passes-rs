@@ -16,6 +16,7 @@ pub struct Location {
     pub altitude: Option<f64>,
 
     /// The text to display on the lock screen when the pass is relevant.
+    ///
     /// For example, a description of a nearby location, such as “Store nearby on 1st and Main”.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]

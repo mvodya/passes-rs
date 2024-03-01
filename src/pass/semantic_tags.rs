@@ -3,6 +3,7 @@ use is_empty::IsEmpty;
 use serde::{Deserialize, Serialize};
 
 /// Machine-readable metadata the system uses to offer a pass and suggest related actions.
+///
 /// <https://developer.apple.com/documentation/walletpasses/semantictags>
 #[derive(Serialize, Deserialize, Debug, IsEmpty)]
 #[serde(rename_all = "camelCase")]
@@ -13,6 +14,7 @@ pub struct SemanticTags {
     pub airline_code: Option<String>,
 
     /// An array of the Apple Music persistent ID for each artist performing at the event, in decreasing order of significance.
+    ///
     /// Use this key for any type of event ticket.
     #[serde(default)]
     #[serde(rename = "artistIDs")]
@@ -51,7 +53,9 @@ pub struct SemanticTags {
     pub boarding_sequence_number: Option<String>,
 
     /// The number of the passenger car.
+    ///
     /// A train car is also called a carriage, wagon, coach, or bogie in some countries.
+    ///
     /// Use this key only for a train or other rail boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -63,6 +67,7 @@ pub struct SemanticTags {
     pub confirmation_number: Option<String>,
 
     /// The updated date and time of arrival, if different from the originally scheduled date and time.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -70,6 +75,7 @@ pub struct SemanticTags {
     pub current_arrival_date: Option<DateTime<Utc>>,
 
     /// The updated date and time of boarding, if different from the originally scheduled date and time.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -77,6 +83,7 @@ pub struct SemanticTags {
     pub current_boarding_date: Option<DateTime<Utc>>,
 
     /// The updated departure date and time, if different from the originally scheduled date and time.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -84,108 +91,131 @@ pub struct SemanticTags {
     pub current_departure_date: Option<DateTime<Utc>>,
 
     /// The IATA airport code for the departure airport, such as “MPM” or “LHR”.
+    ///
     /// Use this key only for airline boarding passes.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub departure_airport_code: Option<String>,
 
     /// The full name of the departure airport, such as “Maputo International Airport”.
+    ///
     /// Use this key only for airline boarding passes.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub departure_airport_name: Option<String>,
 
     /// The gate number or letters of the departure gate, such as “1A”.
+    ///
     /// Do not include the word “Gate.”
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub departure_gate: Option<String>,
 
     /// An object that represents the geographic coordinates of the transit departure location, suitable for display on a map.
+    ///
     /// If possible, use precise locations, which are more useful to travelers; for example, the specific location of an airport gate.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub departure_location: Option<SemanticTagLocation>,
 
     /// A brief description of the departure location.
+    ///
     /// For example, for a flight departing from an airport whose code is “LHR,” an appropriate description might be “London, Heathrow“.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub departure_location_description: Option<String>,
 
     /// The name of the departure platform, such as “A”.
+    ///
     /// Don’t include the word “Platform.” Use this key only for a train or other rail boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub departure_platform: Option<String>,
 
     /// The name of the departure station, such as “1st Street Station”.
+    ///
     /// Use this key only for a train or other rail boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub departure_station_name: Option<String>,
 
     /// The name or letter of the departure terminal, such as “A”.
+    ///
     /// Don’t include the word “Terminal.” Use this key only for airline boarding passes.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub departure_terminal: Option<String>,
 
     /// The IATA airport code for the destination airport, such as “MPM” or “LHR”.
+    ///
     /// Use this key only for airline boarding passes.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub destination_airport_code: Option<String>,
 
     /// The full name of the destination airport, such as “London Heathrow”.
+    ///
     /// Use this key only for airline boarding passes.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub destination_airport_name: Option<String>,
 
     /// The gate number or letter of the destination gate, such as “1A”.
+    ///
     /// Don’t include the word “Gate”.
+    ///
     /// Use this key only for airline boarding passes.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub destination_gate: Option<String>,
 
     /// An object that represents the geographic coordinates of the transit departure location, suitable for display on a map.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub destination_location: Option<SemanticTagLocation>,
 
     /// A brief description of the destination location.
+    ///
     /// For example, for a flight arriving at an airport whose code is “MPM,” “Maputo“ might be an appropriate description.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub destination_location_description: Option<String>,
 
     /// The name of the destination platform, such as “A”.
+    ///
     /// Don’t include the word “Platform”.
+    ///
     /// Use this key only for a train or other rail boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub destination_platform: Option<String>,
 
     /// The name of the destination station, such as “1st Street Station”.
+    ///
     /// Use this key only for a train or other rail boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub destination_station_name: Option<String>,
 
     /// The terminal name or letter of the destination terminal, such as “A”.
+    ///
     /// Don’t include the word “Terminal”.
+    ///
     /// Use this key only for airline boarding passes.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub destination_terminal: Option<String>,
 
     /// The duration of the event or transit journey, in seconds.
+    ///
     /// Use this key for any type of boarding pass and any type of event ticket.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -198,12 +228,14 @@ pub struct SemanticTags {
     pub event_end_date: Option<DateTime<Utc>>,
 
     /// The full name of the event, such as the title of a movie.
+    ///
     /// Use this key for any type of event ticket.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event_name: Option<String>,
 
     /// The date and time the event starts.
+    ///
     /// Use this key for any type of event ticket.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -221,6 +253,7 @@ pub struct SemanticTags {
     pub flight_code: Option<String>,
 
     /// The numeric portion of the IATA flight code, such as 123 for flightCode “EX123”.
+    ///
     /// Use this key only for airline boarding passes.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -290,6 +323,7 @@ pub struct SemanticTags {
     pub passenger_name: Option<SemanticTagPersonNameComponents>,
 
     /// An array of the full names of the performers and opening acts at the event, in decreasing order of significance.
+    ///
     /// Use this key for any type of event ticket.
     #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -297,12 +331,14 @@ pub struct SemanticTags {
     pub performer_names: Vec<String>,
 
     /// The priority status the ticketed passenger holds, such as “Gold” or “Silver”.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub priority_status: Option<String>,
 
     /// An array of objects that represent the details for each seat at an event or on a transit journey.
+    ///
     /// Use this key for any type of boarding pass or event ticket.
     #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -310,13 +346,16 @@ pub struct SemanticTags {
     pub seats: Vec<SemanticTagSeat>,
 
     /// The type of security screening for the ticketed passenger, such as “Priority”.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub security_screening: Option<String>,
 
     /// Determines whether the user’s device remains silent during an event or transit journey.
+    ///
     /// The system may override the key and determine the length of the period of silence.
+    ///
     /// Use this key for any type of boarding pass or event ticket.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -338,13 +377,16 @@ pub struct SemanticTags {
     pub transit_provider: Option<String>,
 
     /// A brief description of the current boarding status for the vessel, such as “On Time” or “Delayed”.
+    ///
     /// For delayed status, provide [current_boarding_date](SemanticTags::current_boarding_date), [current_departure_date](SemanticTags::current_arrival_date), and [current_arrival_date](SemanticTags::current_arrival_date) where available.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transit_status: Option<String>,
 
     /// A brief description that explains the reason for the current transitStatus, such as “Thunderstorms”.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -356,47 +398,56 @@ pub struct SemanticTags {
     pub vehicle_name: Option<String>,
 
     /// The identifier of the vehicle to board, such as the aircraft registration number or train number.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vehicle_number: Option<String>,
 
     /// A brief description of the type of vehicle to board, such as the model and manufacturer of a plane or the class of a boat.
+    ///
     /// Use this key for any type of boarding pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vehicle_type: Option<String>,
 
     /// The full name of the entrance, such as “Gate A”, to use to gain access to the ticketed event.
+    ///
     /// Use this key for any type of event ticket.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub venue_entrance: Option<String>,
 
     /// An object that represents the geographic coordinates of the venue.
+    ///
     /// Use this key for any type of event ticket.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub venue_location: Option<SemanticTagLocation>,
 
-    /// The full name of the venue. Use this key for any type of event ticket.
+    /// The full name of the venue.
+    ///
+    /// Use this key for any type of event ticket.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub venue_name: Option<String>,
 
     /// The phone number for enquiries about the venue’s ticketed event.
+    ///
     /// Use this key for any type of event ticket.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub venue_phone_number: Option<String>,
 
     /// The full name of the room where the ticketed event is to take place.
+    ///
     /// Use this key for any type of event ticket.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub venue_room: Option<String>,
 
     /// An array of objects that represent the WiFi networks associated with the event; for example, the network name and password associated with a developer conference.
+    ///
     /// Use this key for any type of pass.
     #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]

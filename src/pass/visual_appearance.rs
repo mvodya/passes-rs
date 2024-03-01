@@ -6,6 +6,7 @@ use serde::{de, Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct VisualAppearance {
     /// A color for the label text of the pass.
+    ///
     /// If you don’t provide a value, the system determines the label color.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]

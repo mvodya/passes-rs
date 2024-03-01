@@ -21,6 +21,7 @@ pub mod visual_appearance;
 pub mod web_service;
 
 /// Required fields for [Pass]
+///
 /// Used for [Pass] construction
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -44,6 +45,7 @@ pub struct PassConfig {
 }
 
 /// Represents a pass (pass.json file)
+///
 /// Example for making [Pass] with [PassConfig]:
 ///
 /// ```
@@ -68,7 +70,9 @@ pub struct Pass {
     pub config: PassConfig,
 
     /// An identifier the system uses to group related boarding passes or event tickets.
+    ///
     /// Wallet displays passes with the same [grouping_identifier](Pass::grouping_identifier), [pass_type_identifier](PassConfig::pass_type_identifier), and type as a group.
+    ///
     /// Use this identifier to group passes that are tightly related, such as boarding passes for different connections on the same trip.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -109,6 +113,7 @@ pub struct Pass {
     pub associated_store_identifiers: Vec<i32>,
 
     /// Implement a web server to register, update, and unregister a pass on a device.
+    ///
     /// See [Apple documentation](https://developer.apple.com/documentation/walletpasses/adding_a_web_service_to_update_passes)
     #[serde(default)]
     #[serde(flatten)]
@@ -116,25 +121,30 @@ pub struct Pass {
     pub web_service: Option<WebService>,
 
     /// Controls whether to show the Share button on the back of a pass.
+    ///
     /// A value of true removes the button. The default value is false.
+    ///
     /// This flag has no effect in earlier versions of iOS, nor does it prevent sharing the pass in some other way.
     #[serde(default)]
     #[serde(skip_serializing_if = "_is_false")]
     pub sharing_prohibited: bool,
 
     /// Controls whether to display the strip image without a shine effect.
+    ///
     /// The default value is true.
     #[serde(default = "_default_true")]
     #[serde(skip_serializing_if = "_is_true")]
     pub suppress_strip_shine: bool,
 
     /// Indicates that the pass is void, such as a redeemed, one-time-use coupon.
+    ///
     /// The default value is false.
     #[serde(default)]
     #[serde(skip_serializing_if = "_is_false")]
     pub voided: bool,
 
     /// Barcode on a pass
+    ///
     /// The system uses the first displayable barcode for the device.
     #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -161,8 +171,9 @@ pub struct Pass {
     pub nfc: Option<NFC>,
 
     /// Semantic tags
-    // Metadata the system uses to offer a pass and suggest related actions.
-    // For example, setting Don’t Disturb mode for the duration of a movie.
+    ///
+    /// Metadata the system uses to offer a pass and suggest related actions.
+    /// For example, setting Don’t Disturb mode for the duration of a movie.
     #[serde(default)]
     #[serde(skip_serializing_if = "SemanticTags::is_empty")]
     pub semantics: SemanticTags,
