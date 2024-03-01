@@ -44,6 +44,19 @@ pub struct PassConfig {
 }
 
 /// Represents a pass (pass.json file)
+/// Example for making [Pass] with [PassConfig]:
+///
+/// ```
+/// use passes::{PassBuilder, PassConfig};
+/// let pass = PassBuilder::new(PassConfig {
+///     organization_name: String::from("Apple inc."),
+///     description: String::from("Example pass"),
+///     pass_type_identifier: String::from("com.example.pass"),
+///     team_identifier: String::from("AA00AA0A0A"),
+///     serial_number: String::from("ABCDEFG1234567890"),
+/// })
+/// .build();
+/// ```
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Pass {
