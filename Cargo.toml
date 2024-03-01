@@ -9,6 +9,8 @@ readme = "README.md"
 include = ["src/", "LICENSE", "README.md"]
 keywords = ["passkit", "wallet", "apple"]
 categories = ["parsing"]
+documentation = "https://docs.rs/passes/0.1.0/passes/"
+repository = "https://github.com/mvodya/passes-rs"
 
 [workspace]
 members = [
