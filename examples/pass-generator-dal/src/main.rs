@@ -8,12 +8,17 @@ use passes::visual_appearance;
 use passes::Package;
 use passes::{PassBuilder, PassConfig};
 
-use chrono::prelude::*;
+use chrono::Duration;
 
 use std::fs::File;
 use std::path::Path;
 
 fn main() {
+    // Calculate time
+    let time_to_departure = chrono::offset::Local::now().to_utc() + Duration::hours(4);
+    let time_to_boarding = time_to_departure - Duration::minutes(30);
+    let time_to_arrive = time_to_departure + Duration::hours(4);
+
     // Creating pass
     let pass = PassBuilder::new(PassConfig {
         organization_name: "Dodo Airlines".into(),
@@ -123,8 +128,8 @@ fn main() {
             },
         )),
     )
-    .relevant_date(Utc.with_ymd_and_hms(2024, 02, 28, 0, 0, 0).unwrap())
-    .expiration_date(Utc.with_ymd_and_hms(2024, 02, 29, 0, 0, 0).unwrap())
+    .relevant_date(time_to_departure)
+    .expiration_date(time_to_arrive)
     .semantics(semantic_tags::SemanticTags {
         airline_code: String::from("DL 1132").into(),
         departure_gate: String::from("21").into(),
@@ -133,18 +138,9 @@ fn main() {
             longitude: 132.1451673,
         }
         .into(),
-        original_boarding_date: Utc
-            .with_ymd_and_hms(2024, 02, 29, 18, 46, 0)
-            .unwrap()
-            .into(),
-        original_departure_date: Utc
-            .with_ymd_and_hms(2024, 02, 29, 18, 46, 0)
-            .unwrap()
-            .into(),
-        original_arrival_date: Utc
-            .with_ymd_and_hms(2024, 02, 29, 23, 20, 0)
-            .unwrap()
-            .into(),
+        original_boarding_date: time_to_boarding.into(),
+        original_departure_date: time_to_departure.into(),
+        original_arrival_date: time_to_arrive.into(),
         seats: vec![semantic_tags::SemanticTagSeat {
             seat_identifier: String::from("20A").into(),
             seat_number: String::from("A").into(),
@@ -189,24 +185,7 @@ fn main() {
         .unwrap();
 
     // Add certificates
-    let sign_cert_path = Path::new("certs/signerCert.pem");
-    let mut file_sign_cert = match File::open(&sign_cert_path) {
-        Err(why) => panic!("couldn't open {}: {}", sign_cert_path.display(), why),
-        Ok(file) => file,
-    };
-    let mut sign_cert_data = Vec::new();
-    std::io::Read::read_to_end(&mut file_sign_cert, &mut sign_cert_data).unwrap();
-
-    let sign_cert_key_path = Path::new("certs/signerKey.key");
-    let mut file_sign_key_cert = match File::open(&sign_cert_key_path) {
-        Err(why) => panic!("couldn't open {}: {}", sign_cert_key_path.display(), why),
-        Ok(file) => file,
-    };
-    let mut sign_cert_key_data = Vec::new();
-    std::io::Read::read_to_end(&mut file_sign_key_cert, &mut sign_cert_key_data).unwrap();
-
-    let sign_config =
-        SignConfig::new(sign::WWDR::G4, &sign_cert_data, &sign_cert_key_data).unwrap();
+    let sign_config = setup_sign_config("certs/signerCert.pem", "certs/signerKey.key");
     package.add_certificates(sign_config);
 
     // Save package as .pkpass
@@ -216,4 +195,25 @@ fn main() {
         Ok(file) => file,
     };
     package.write(file).unwrap();
+}
+
+// Read cert & key and make SignConfig
+fn setup_sign_config(cert: &str, key: &str) -> SignConfig {
+    let sign_cert_path = Path::new(cert);
+    let mut file_sign_cert = match File::open(&sign_cert_path) {
+        Err(why) => panic!("couldn't open {}: {}", sign_cert_path.display(), why),
+        Ok(file) => file,
+    };
+    let mut sign_cert_data = Vec::new();
+    std::io::Read::read_to_end(&mut file_sign_cert, &mut sign_cert_data).unwrap();
+
+    let sign_cert_key_path = Path::new(key);
+    let mut file_sign_key_cert = match File::open(&sign_cert_key_path) {
+        Err(why) => panic!("couldn't open {}: {}", sign_cert_key_path.display(), why),
+        Ok(file) => file,
+    };
+    let mut sign_cert_key_data = Vec::new();
+    std::io::Read::read_to_end(&mut file_sign_key_cert, &mut sign_cert_key_data).unwrap();
+
+    SignConfig::new(sign::WWDR::G4, &sign_cert_data, &sign_cert_key_data).unwrap()
 }
